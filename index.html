@@ -730,6 +730,37 @@
       <h2>Sim2Real Evidence Metrics</h2>
       <p class="section-desc">Matched 0–1 fidelity metrics for network timing and robot motion quality.</p>
 
+      <div class="section-label">Evidence Story</div>
+      <h2>From Claim to Action</h2>
+      <p class="section-desc">A five-step evidence pipeline connecting network conditions to trustworthy robot behaviour.</p>
+      <div class="evidence-pipeline" aria-label="Evidence pipeline: Claim, Evidence, Analysis, Risk, Action">
+        <article class="evidence-step">
+          <div class="evidence-step-number">Step 1</div>
+          <h3>Claim</h3>
+          <p>Trustworthy teleoperation evidence should link network delay with robot motion output.</p>
+        </article>
+        <article class="evidence-step">
+          <div class="evidence-step-number">Step 2</div>
+          <h3>Evidence</h3>
+          <p>We use RTT and latency data together with UR5e robot arm motion data.</p>
+        </article>
+        <article class="evidence-step">
+          <div class="evidence-step-number">Step 3</div>
+          <h3>Analysis</h3>
+          <p>We introduce two metrics: a network-quality metric and a motion-quality metric to answer: “How bad is the data?”</p>
+        </article>
+        <article class="evidence-step">
+          <div class="evidence-step-number">Step 4</div>
+          <h3>Risk</h3>
+          <p>High latency may coincide with less smooth or less stable robot behaviour.</p>
+        </article>
+        <article class="evidence-step">
+          <div class="evidence-step-number">Step 5</div>
+          <h3>Action</h3>
+          <p>Future robot datasets should report both network-quality and motion-quality metrics during data collection.</p>
+        </article>
+      </div>
+
       <div class="teleoperation-overview">
         <h3>How Remote Robot Control Works</h3>
         <p>Before reading the metrics, this diagram shows the journey of one remote-control message between UCL, the robot arm, and the Nottingham data server.</p>
@@ -748,37 +779,6 @@
             <p>RTT measures the complete round trip. NFI summarises network quality, while TAF summarises how accurately the robot followed its target.</p>
           </div>
         </div>
-      </div>
-
-      <div class="section-label">Evidence Story</div>
-      <h2>From Claim to Action</h2>
-      <p class="section-desc">A five-step evidence pipeline connecting network conditions to trustworthy robot behaviour.</p>
-      <div class="evidence-pipeline" aria-label="Evidence pipeline: Claim, Evidence, Method, Risk, Action">
-        <article class="evidence-step">
-          <div class="evidence-step-number">Step 1</div>
-          <h3>Claim</h3>
-          <p>Trustworthy teleoperation evidence should link network delay with robot motion output.</p>
-        </article>
-        <article class="evidence-step">
-          <div class="evidence-step-number">Step 2</div>
-          <h3>Evidence</h3>
-          <p>We use RTT and latency data together with UR5e robot arm motion data.</p>
-        </article>
-        <article class="evidence-step">
-          <div class="evidence-step-number">Step 3</div>
-          <h3>Method</h3>
-          <p>We align both datasets by time and analyse delay, speed, smoothness, and jerk.</p>
-        </article>
-        <article class="evidence-step">
-          <div class="evidence-step-number">Step 4</div>
-          <h3>Risk</h3>
-          <p>High latency may coincide with less smooth or less stable robot behaviour.</p>
-        </article>
-        <article class="evidence-step">
-          <div class="evidence-step-number">Step 5</div>
-          <h3>Action</h3>
-          <p>Future datasets should include command logs, reference paths, and latency-aware motion metrics.</p>
-        </article>
       </div>
 
       <!-- Combined Metrics -->
@@ -929,7 +929,6 @@
     document.getElementById('metric-orientation-rmse').textContent = tracking.orientation_rmse_deg.toFixed(3) + '°';
     document.getElementById('metric-tracking-lag').textContent = tracking.median_lag_ms.toFixed(0) + ' ms';
     document.getElementById('metric-taf').textContent = tracking.tracking_fidelity.toFixed(3);
-    document.getElementById('taf-score-centre').textContent = tracking.tracking_fidelity.toFixed(3);
 
     const cFont = { family: "-apple-system, sans-serif" };
     const cGrid = '#E5E5E5';
@@ -1057,35 +1056,6 @@
         scales: {
           x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 14, font: { size: 11 }, callback(v) { return v + 's'; } }, grid: { color: cGrid } },
           y: { title: { display: true, text: 'Fidelity (0–1)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0, max: 1 }
-        }
-      }
-    });
-
-    new Chart(document.getElementById('taf-score-chart'), {
-      type: 'doughnut',
-      data: {
-        datasets: [{
-          data: [tracking.tracking_fidelity, 1 - tracking.tracking_fidelity],
-          backgroundColor: [cPurple, '#DDD6E2'],
-          borderWidth: 0,
-          hoverOffset: 0
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '74%',
-        rotation: -90,
-        circumference: 360,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: context => context.dataIndex === 0
-                ? 'TAF: ' + tracking.tracking_fidelity.toFixed(3)
-                : 'Gap to 1.000: ' + (1 - tracking.tracking_fidelity).toFixed(3)
-            }
-          }
         }
       }
     });
