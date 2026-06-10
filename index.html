@@ -386,6 +386,26 @@
         <p><strong>Joint coordination.</strong> Joint angles show coordinated multi-joint motion, confirming active manipulation. The joint data captures the robot's configuration space, complementing the Cartesian TCP view.</p>
         <p><strong>Sim2real relevance.</strong> Combined with RTT data, motion data reveals which movements coincide with latency spikes. High-speed motions during high-latency periods represent the worst-case sim2real gap.</p>
       </div>
+
+      <h3 style="margin-top:36px;">Latency–Motion Evidence</h3>
+      <p style="color:var(--grey);font-size:14px;">TCP samples aligned to the nearest RTT observation. Absolute jerk captures abrupt changes in end-effector acceleration.</p>
+      <div class="chart-area" style="height:300px;"><canvas id="latency-jerk-chart"></canvas></div>
+
+      <div class="two-col" style="margin-top:28px;">
+        <div>
+          <h3>Jerk by Network Condition</h3>
+          <p style="color:var(--grey);font-size:14px;">Normal RTT (&lt;60 ms) compared with high RTT (&gt;100 ms).</p>
+          <div class="chart-area" style="height:240px;"><canvas id="jerk-comparison-chart"></canvas></div>
+        </div>
+        <div>
+          <h3>Motion Degradation Score</h3>
+          <p style="color:var(--grey);font-size:14px;">Rolling 0–100 score combining normalised RTT and end-effector jerk.</p>
+          <div class="chart-area" style="height:240px;"><canvas id="motion-degradation-chart"></canvas></div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:36px;">Latency–Motion Interpretation</h3>
+      <div class="highlight-block" id="motion-analysis-interpretation"></div>
     </section>
 
     <!-- ── Challenge 1: TFI Metric ── -->
@@ -483,6 +503,7 @@
   <!-- Data -->
   <script src="data.js"></script>
   <script src="motion_data.js"></script>
+  <script src="motion_analysis.js"></script>
   <script>
     const rtts = RTT_DATA.map(d => d.rtt);
     const meanRTT = rtts.reduce((a,b) => a+b, 0) / rtts.length;
@@ -638,6 +659,69 @@
         }
       }
     });
+
+    // Latency-motion analysis generated from the source RTT and UR5e CSV files.
+    const motionSummary = MOTION_ANALYSIS.summary;
+    new Chart(document.getElementById('latency-jerk-chart'), {
+      type: 'scatter',
+      data: { datasets: [{
+        data: MOTION_ANALYSIS.scatter,
+        pointRadius: 2.5,
+        pointHoverRadius: 4,
+        backgroundColor: 'rgba(80,7,120,.42)'
+      }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'RTT (ms)', color: cTick, font: cFont }, ticks: { color: cTick }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'Absolute jerk (m/s³)', color: cTick, font: cFont }, ticks: { color: cTick }, grid: { color: cGrid }, beginAtZero: true }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('jerk-comparison-chart'), {
+      type: 'bar',
+      data: {
+        labels: MOTION_ANALYSIS.comparison.labels,
+        datasets: [
+          { label: 'Mean', data: MOTION_ANALYSIS.comparison.mean_jerk, backgroundColor: ['#500778','#D64545'], borderRadius: 3 },
+          { label: 'Median', data: MOTION_ANALYSIS.comparison.median_jerk, backgroundColor: ['rgba(80,7,120,.35)','rgba(214,69,69,.35)'], borderRadius: 3 }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: cTick, font: { size: 11 } } } },
+        scales: {
+          x: { ticks: { color: cTick, font: { size: 11 } }, grid: { display: false } },
+          y: { title: { display: true, text: 'Absolute jerk (m/s³)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, beginAtZero: true }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('motion-degradation-chart'), {
+      type: 'line',
+      data: { labels: MOTION_ANALYSIS.timeline.map(d=>d.t), datasets: [{
+        data: MOTION_ANALYSIS.timeline.map(d=>d.score),
+        borderColor: '#D64545',
+        backgroundColor: 'rgba(214,69,69,.06)',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.25
+      }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'Motion time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 8, font: { size: 11 } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'Score', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0, max: 100 }
+        }
+      }
+    });
+
+    const jerkRatio = motionSummary.high_to_normal_mean_jerk_ratio;
+    const correlation = motionSummary.spearman_rtt_jerk;
+    const jointSummary = motionSummary.joint_motion;
+    document.getElementById('motion-analysis-interpretation').innerHTML = `
+      <p><strong>Observed association.</strong> Across ${MOTION_ANALYSIS.meta.aligned_samples} aligned samples, high-latency periods show ${jerkRatio.toFixed(1)}× the mean end-effector jerk of normal-latency periods. However, the rank correlation is only ${correlation.toFixed(2)}, so this is a weak association rather than evidence that latency alone caused each motion disturbance.</p>
+      <p><strong>Trustworthy deployment.</strong> The latency tail coincides with less smooth motion often enough to support latency-aware monitoring, conservative speed limits, and fail-safe thresholds beyond the lab. Six-joint derivatives were also analysed; P95 aggregate joint acceleration was ${jointSummary.p95_acceleration_rad_s2.toFixed(3)} rad/s². This single session supports a deployment hypothesis, not a safety certificate; repeated controlled trials are needed to separate network effects from commanded manoeuvres and sensor noise.</p>
+    `;
   </script>
 </body>
 </html>
