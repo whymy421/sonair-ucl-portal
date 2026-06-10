@@ -559,49 +559,56 @@
       <p>For teleoperation, timing fidelity is often more critical than positional accuracy — delayed commands accumulate into trajectory divergence. A trajectory planned at 50 Hz assumes each command arrives within 20 ms, but the real network introduces variable delays that compound over time.</p>
 
       <div class="section-label" style="margin-top:52px;">Metric 2 · Motion</div>
-      <h2>Motion Spectral Fidelity (MSF)</h2>
-      <p>The <strong>Motion Spectral Fidelity</strong> uses a Fourier transform of TCP position (<code>x, y, z</code>) and rotation (<code>rx, ry, rz</code>). It measures the proportion of signal energy above 0.75 Hz after uniform resampling and detrending. Lower high-frequency energy means smoother, more repeatable motion.</p>
+      <h2>Target–Actual Tracking Fidelity (TAF)</h2>
+      <p>The <strong>Target–Actual Tracking Fidelity</strong> directly compares commanded and measured robot motion in the AURSAD benchmark subset. Unlike the earlier FFT approach, it measures control error and response delay rather than assuming that all high-frequency movement is noise.</p>
 
       <h3 style="margin-top:28px;">Definition</h3>
-      <div class="formula">MSF = (1 − P<sub>hf</sub>) × (1 − R<sub>hf</sub>)</div>
+      <div class="formula">TAF = 1 − (P<sub>norm</sub> + O<sub>norm</sub> + J<sub>norm</sub> + L<sub>norm</sub>) / 4</div>
       <ul class="def-list">
-        <li><strong>P<sub>hf</sub></strong> — mean high-frequency energy ratio across <code>x, y, z</code>.</li>
-        <li><strong>R<sub>hf</sub></strong> — mean high-frequency energy ratio across <code>rx, ry, rz</code>.</li>
-        <li><strong>High frequency</strong> — spectral energy at or above 0.75 Hz after resampling to 4 Hz.</li>
+        <li><strong>P<sub>norm</sub></strong> — TCP position RMSE / 1 mm reference bound.</li>
+        <li><strong>O<sub>norm</sub></strong> — TCP orientation RMSE / 0.5° reference bound.</li>
+        <li><strong>J<sub>norm</sub></strong> — six-joint RMSE / 0.5° reference bound.</li>
+        <li><strong>L<sub>norm</sub></strong> — target-to-actual response lag / 50 ms reference bound.</li>
       </ul>
 
       <h3>Calculated Result</h3>
       <div class="stats-strip" style="grid-template-columns: repeat(4,1fr);">
         <div class="stats-strip-item">
-          <div class="stats-strip-value" id="metric-phf">—</div>
-          <div class="stats-strip-label">P<sub>hf</sub></div>
+          <div class="stats-strip-value" id="metric-position-rmse">—</div>
+          <div class="stats-strip-label">Position RMSE</div>
         </div>
         <div class="stats-strip-item">
-          <div class="stats-strip-value" id="metric-rhf">—</div>
-          <div class="stats-strip-label">R<sub>hf</sub></div>
+          <div class="stats-strip-value" id="metric-orientation-rmse">—</div>
+          <div class="stats-strip-label">Orientation RMSE</div>
         </div>
         <div class="stats-strip-item">
-          <div class="stats-strip-value">0.75 Hz</div>
-          <div class="stats-strip-label">Cut-off</div>
+          <div class="stats-strip-value" id="metric-tracking-lag">—</div>
+          <div class="stats-strip-label">Median Lag</div>
         </div>
         <div class="stats-strip-item">
-          <div class="stats-strip-value" id="metric-msf">—</div>
-          <div class="stats-strip-label">MSF</div>
+          <div class="stats-strip-value" id="metric-taf">—</div>
+          <div class="stats-strip-label">TAF</div>
         </div>
       </div>
 
-      <h3>Frequency Evidence</h3>
-      <p style="color:var(--grey);font-size:14px;">Normalised FFT power for position and rotation. The dashed line marks the 0.75 Hz high-frequency threshold.</p>
-      <div class="chart-area" style="height:260px;"><canvas id="motion-spectrum-chart"></canvas></div>
-
-      <h3>MSF Over Time</h3>
-      <p style="color:var(--grey);font-size:14px;">Rolling 32-second windows. Dips indicate periods with a larger high-frequency motion component.</p>
-      <div class="chart-area" style="height:240px;"><canvas id="msf-chart"></canvas></div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Target vs Actual TCP Path</h3>
+          <p style="color:var(--grey);font-size:14px;">Representative normal operation 23. Near-overlap indicates accurate Cartesian tracking.</p>
+          <div class="chart-area" style="height:300px;"><canvas id="tracking-path-chart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>TAF Across 75 Operations</h3>
+          <p style="color:var(--grey);font-size:14px;">Each point is one assembly operation; higher values indicate tighter target–actual tracking.</p>
+          <div class="chart-area" style="height:300px;"><canvas id="tracking-score-chart"></canvas></div>
+        </div>
+      </div>
 
       <h3 style="margin-top:28px;">Interpretation</h3>
       <div class="highlight-block">
-        <p><strong>Spectral evidence.</strong> High-frequency energy can indicate vibration, control chatter, quantisation, or sensor noise. It may also contain genuine fast manoeuvres, so MSF should be interpreted alongside the trajectory and command log rather than used as a standalone safety verdict.</p>
-        <p><strong>Adoption across SONAIR.</strong> NFI and MSF share the same 0–1 fidelity format. Together they separate network timing quality from motion smoothness, enabling campuses to compare where sim2real degradation enters the teleoperation chain.</p>
+        <p><strong>Tracking evidence.</strong> Across 212,433 samples, TCP position RMSE is 0.137 mm, orientation RMSE is 0.0206°, joint RMSE is 0.0102°, and the typical target-to-actual lag is 10 ms. The resulting TAF is approximately 0.900.</p>
+        <p><strong>Important limitation.</strong> Normal and faulty assembly outcomes have similar tracking scores. Missing screws or damaged threads are process faults, not necessarily controller faults. TAF therefore measures robot control fidelity; it should be combined with task-force, vision, or assembly-state evidence for fault detection.</p>
+        <p><strong>Adoption across SONAIR.</strong> NFI and TAF share the same 0–1 format, separating network timing quality from robot target-following quality without labelling genuine fast motion as noise.</p>
       </div>
     </section>
 
@@ -654,7 +661,7 @@
   <!-- Data -->
   <script src="data.js"></script>
   <script src="motion_data.js"></script>
-  <script src="motion_noise.js"></script>
+  <script src="tracking_fidelity.js"></script>
   <script src="motion_player.js"></script>
   <script>
     const rtts = RTT_DATA.map(d => d.rtt);
@@ -684,10 +691,11 @@
     document.getElementById('metric-lrate').textContent = L_rate.toFixed(3);
     document.getElementById('metric-nfi').textContent = NFI.toFixed(3);
 
-    const motionNoise = MOTION_NOISE.summary;
-    document.getElementById('metric-phf').textContent = motionNoise.position_high_frequency_ratio.toFixed(3);
-    document.getElementById('metric-rhf').textContent = motionNoise.rotation_high_frequency_ratio.toFixed(3);
-    document.getElementById('metric-msf').textContent = motionNoise.motion_spectral_fidelity.toFixed(3);
+    const tracking = TRACKING_FIDELITY.summary;
+    document.getElementById('metric-position-rmse').textContent = tracking.position_rmse_mm.toFixed(3) + ' mm';
+    document.getElementById('metric-orientation-rmse').textContent = tracking.orientation_rmse_deg.toFixed(3) + '°';
+    document.getElementById('metric-tracking-lag').textContent = tracking.median_lag_ms.toFixed(0) + ' ms';
+    document.getElementById('metric-taf').textContent = tracking.tracking_fidelity.toFixed(3);
 
     const cFont = { family: "-apple-system, sans-serif" };
     const cGrid = '#E5E5E5';
@@ -750,58 +758,51 @@
       }
     });
 
-    const spectrum = MOTION_NOISE.spectrum;
-    const cutoffLine = {
-      id: 'cutoffLine',
-      afterDraw(chart) {
-        const cutoffIndex = spectrum.findIndex(d=>d.frequency>=0.75);
-        if (cutoffIndex < 0) return;
-        const x = chart.scales.x.getPixelForValue(cutoffIndex);
-        const area = chart.chartArea;
-        const context = chart.ctx;
-        context.save();
-        context.strokeStyle = '#D64545';
-        context.setLineDash([5,5]);
-        context.lineWidth = 1;
-        context.beginPath();
-        context.moveTo(x, area.top);
-        context.lineTo(x, area.bottom);
-        context.stroke();
-        context.fillStyle = '#D64545';
-        context.font = '11px -apple-system, sans-serif';
-        context.fillText('0.75 Hz', x + 5, area.top + 13);
-        context.restore();
-      }
-    };
-    new Chart(document.getElementById('motion-spectrum-chart'), {
-      type: 'line',
-      data: {
-        labels: spectrum.map(d=>d.frequency),
-        datasets: [
-          { label: 'Position (XYZ)', data: spectrum.map(d=>d.position_power), borderColor: cPurple, borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
-          { label: 'Rotation (Rx/Ry/Rz)', data: spectrum.map(d=>d.rotation_power), borderColor: '#00BDF2', borderWidth: 1.5, pointRadius: 0, tension: 0.2 }
-        ]
-      },
-      plugins: [cutoffLine],
+    const examplePath = TRACKING_FIDELITY.example_trajectory;
+    new Chart(document.getElementById('tracking-path-chart'), {
+      type: 'scatter',
+      data: { datasets: [
+        {
+          label: 'Target',
+          data: examplePath.map(d=>({x:d.target_x,y:d.target_y})),
+          borderColor: cPurple, backgroundColor: cPurple, borderWidth: 2,
+          pointRadius: 0, showLine: true, tension: 0.15
+        },
+        {
+          label: 'Actual',
+          data: examplePath.map(d=>({x:d.actual_x,y:d.actual_y})),
+          borderColor: '#00BDF2', backgroundColor: '#00BDF2', borderWidth: 1.5,
+          pointRadius: 0, showLine: true, tension: 0.15
+        }
+      ] },
       options: { responsive: true, maintainAspectRatio: false,
         plugins: { legend: { position: 'bottom', labels: { color: cTick, font: { size: 11 } } } },
         scales: {
-          x: { title: { display: true, text: 'Frequency (Hz)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 10, font: { size: 11 } }, grid: { color: cGrid } },
-          y: { title: { display: true, text: 'Normalised power', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0, max: 1 }
+          x: { title: { display: true, text: 'TCP X (mm)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'TCP Y (mm)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid } }
         }
       }
     });
 
-    new Chart(document.getElementById('msf-chart'), {
-      type: 'line',
-      data: { labels: MOTION_NOISE.timeline.map(d=>d.t), datasets: [{
-        data: MOTION_NOISE.timeline.map(d=>d.value), borderColor: '#00BDF2', backgroundColor: 'rgba(0,189,242,.06)',
-        borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3
-      }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+    const outcomeColours = {
+      normal_operation: '#500778',
+      damaged_screw_thread: '#D64545',
+      extra_assembly_component: '#E0A030',
+      missing_screw: '#00BDF2',
+      damaged_plate_thread: '#8C2DA7'
+    };
+    new Chart(document.getElementById('tracking-score-chart'), {
+      type: 'scatter',
+      data: { datasets: Object.keys(outcomeColours).map(outcome=>({
+        label: outcome.replaceAll('_',' '),
+        data: TRACKING_FIDELITY.operations.filter(d=>d.outcome===outcome).map(d=>({x:d.id,y:d.score})),
+        backgroundColor: outcomeColours[outcome], pointRadius: 4
+      })) },
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: cTick, font: { size: 10 }, boxWidth: 10 } } },
         scales: {
-          x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 12, font: { size: 11 } }, grid: { color: cGrid } },
-          y: { title: { display: true, text: 'MSF', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0, max: 1 }
+          x: { title: { display: true, text: 'Operation ID', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'TAF', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0.5, max: 1 }
         }
       }
     });
