@@ -6,304 +6,453 @@
   <title>UCL Robotics — SONAIR Sub-Portal</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>
-    /* ── Typography scale ── */
     :root {
-      --primary: #500778;
-      --bright: #AC10E6;
-      --heritage: #00BDF2;
-      --text: #1C1C1C;
-      --text-secondary: #555;
-      --text-caption: #777;
-      --border: #E5E5E5;
-      --bg: #FFFFFF;
-      --bg-subtle: #F7F5F2;
-      --bg-section: #FAF8F6;
+      --ucl-dark: #500778;
+      --ucl-mid: #8C2DA7;
+      --ucl-bright: #AC10E6;
+      --ucl-blue: #00BDF2;
+      --black: #1D1D1D;
+      --grey-dark: #333;
+      --grey: #6D6D6D;
+      --grey-light: #B5B5B5;
+      --grey-rule: #DCDCDC;
+      --grey-bg: #F3F3F3;
+      --white: #FFFFFF;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.65;
-      font-size: 15px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--white);
+      color: var(--black);
+      line-height: 1.6;
+      font-size: 16px;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Layout ── */
-    .container { width: min(920px, 90vw); margin: 0 auto; }
-
-    /* ── Headings ── */
-    h1 { font-size: 32px; font-weight: 700; line-height: 1.2; letter-spacing: -0.5px; color: var(--primary); }
-    h2 { font-size: 22px; font-weight: 700; line-height: 1.3; color: var(--primary); margin-bottom: 8px; }
-    h3 { font-size: 16px; font-weight: 600; line-height: 1.4; color: var(--text); margin-bottom: 6px; }
-    .caption { font-size: 13px; color: var(--text-caption); line-height: 1.5; }
-    .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-caption); }
-
-    p { margin-bottom: 12px; }
-    p:last-child { margin-bottom: 0; }
-    a { color: var(--primary); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    strong { font-weight: 600; }
-    code { font-family: 'SF Mono', 'Menlo', monospace; font-size: 13px; background: var(--bg-subtle); padding: 1px 5px; border-radius: 3px; }
-
-    /* ── Header ── */
-    header {
-      padding: 32px 0 28px;
-      border-bottom: 1px solid var(--border);
+    /* ── Nav bar ── */
+    .nav-bar {
+      background: var(--ucl-dark);
+      padding: 0;
     }
-    .header-row {
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 24px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 32px;
     }
-    .header-logo { height: 40px; }
-    .header-meta { margin-top: 10px; }
-    .header-meta span { font-size: 13px; color: var(--text-caption); }
-    .header-meta span + span::before { content: '·'; margin: 0 8px; }
-
-    /* ── Sections ── */
-    section { padding: 36px 0; }
-    section + section { border-top: 1px solid var(--border); }
-
-    .section-header { margin-bottom: 20px; }
-    .section-header h2 { margin-bottom: 4px; }
-
-    /* ── Two-column layout ── */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-    @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; gap: 24px; } }
-
-    /* ── Stats row ── */
-    .stats-row { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 20px 0; }
-    .stat-item { flex: 1; padding: 16px 12px; text-align: center; }
-    .stat-item + .stat-item { border-left: 1px solid var(--border); }
-    .stat-value { font-size: 24px; font-weight: 700; color: var(--primary); line-height: 1.2; }
-    .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-caption); margin-top: 4px; }
-
-    /* ── Charts ── */
-    .chart-wrap { position: relative; height: 300px; margin: 16px 0 8px; }
-
-    /* ── Interpretation block ── */
-    .interp { border-left: 3px solid var(--primary); padding: 16px 20px; background: var(--bg-subtle); border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 14px; color: var(--text-secondary); }
-    .interp p { margin-bottom: 10px; }
-    .interp strong { color: var(--text); }
-
-    /* ── Metric section ── */
-    .formula-block {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 14px 20px;
-      font-family: 'SF Mono', 'Menlo', monospace;
+    .nav-logo svg { height: 36px; display: block; }
+    .nav-links { display: flex; gap: 24px; list-style: none; }
+    .nav-links a {
+      color: rgba(255,255,255,.85);
+      text-decoration: none;
       font-size: 15px;
-      color: var(--primary);
-      text-align: center;
-      margin: 12px 0 16px;
-      letter-spacing: 0.5px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      transition: color .15s;
     }
-    .def-list { padding-left: 20px; margin: 8px 0 16px; color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
+    .nav-links a:hover { color: #fff; }
+    .nav-links .active { color: #fff; border-bottom: 2px solid #fff; padding-bottom: 2px; }
+
+    /* ── Hero ── */
+    .hero {
+      background: var(--ucl-dark);
+      color: #fff;
+      padding: 48px 24px 44px;
+    }
+    .hero-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .hero p {
+      font-size: 18px;
+      color: rgba(255,255,255,.75);
+      max-width: 640px;
+      line-height: 1.5;
+    }
+
+    /* ── Content container ── */
+    .content { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Section ── */
+    .section { padding: 48px 0; }
+    .section + .section { border-top: 1px solid var(--grey-rule); }
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ucl-dark);
+      margin-bottom: 8px;
+    }
+    .section h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--black);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+    .section-desc {
+      font-size: 15px;
+      color: var(--grey);
+      margin-bottom: 24px;
+      max-width: 720px;
+    }
+
+    /* ── Typography ── */
+    h3 { font-size: 18px; font-weight: 700; color: var(--black); margin-bottom: 8px; line-height: 1.3; }
+    p { margin-bottom: 12px; color: var(--grey-dark); }
+    p:last-child { margin-bottom: 0; }
+    a { color: var(--ucl-dark); }
+    strong { font-weight: 600; color: var(--black); }
+    code { font-family: 'SF Mono', Menlo, monospace; font-size: 13px; background: var(--grey-bg); padding: 2px 5px; border-radius: 3px; }
+
+    /* ── Two column ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+    @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; gap: 32px; } }
+
+    /* ── Three column ── */
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+    @media (max-width: 700px) { .three-col { grid-template-columns: 1fr; } }
+
+    /* ── Stats strip ── */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      background: var(--grey-bg);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 24px 0;
+    }
+    .stats-strip-item {
+      padding: 20px 16px;
+      text-align: center;
+      border-right: 1px solid var(--grey-rule);
+    }
+    .stats-strip-item:last-child { border-right: none; }
+    .stats-strip-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--ucl-dark);
+      line-height: 1.2;
+    }
+    .stats-strip-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--grey);
+      margin-top: 4px;
+    }
+
+    /* ── Chart ── */
+    .chart-area { position: relative; height: 300px; margin: 16px 0 8px; }
+
+    /* ── Highlight block (interpretation) ── */
+    .highlight-block {
+      background: var(--grey-bg);
+      padding: 24px 28px;
+      border-radius: 4px;
+      margin: 20px 0;
+      font-size: 15px;
+      color: var(--grey-dark);
+      line-height: 1.7;
+    }
+    .highlight-block p { margin-bottom: 12px; }
+    .highlight-block strong { color: var(--black); }
+
+    /* ── Formula ── */
+    .formula {
+      background: var(--ucl-dark);
+      color: #fff;
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 16px;
+      padding: 16px 24px;
+      border-radius: 4px;
+      text-align: center;
+      letter-spacing: 0.5px;
+      margin: 16px 0;
+    }
+
+    /* ── Definition list ── */
+    .def-list { padding-left: 20px; margin: 8px 0 20px; color: var(--grey-dark); font-size: 15px; line-height: 1.8; }
+    .def-list li { margin-bottom: 4px; }
 
     /* ── Tags ── */
-    .tag { display: inline-block; font-size: 12px; color: var(--text-caption); background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; margin: 2px 4px 2px 0; }
+    .tag {
+      display: inline-block;
+      font-size: 13px;
+      color: var(--ucl-dark);
+      background: #F0E8F5;
+      border-radius: 3px;
+      padding: 3px 10px;
+      margin: 3px 4px 3px 0;
+      font-weight: 500;
+    }
 
-    /* ── Buttons ── */
-    .btn { display: inline-block; padding: 8px 20px; font-size: 14px; font-weight: 600; border-radius: 6px; border: 1px solid var(--primary); cursor: pointer; font-family: inherit; transition: background .15s, color .15s; }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: #3d0560; }
-    .btn-secondary { background: #fff; color: var(--primary); }
-    .btn-secondary:hover { background: var(--bg-subtle); }
+    /* ── Button ── */
+    .btn {
+      display: inline-block;
+      padding: 10px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-decoration: none;
+      cursor: pointer;
+      font-family: inherit;
+      border: none;
+      transition: background .15s;
+    }
+    .btn-dark { background: var(--ucl-dark); color: #fff; }
+    .btn-dark:hover { background: #3d0560; }
 
     /* ── Inbox ── */
     #requests-inbox { margin-top: 12px; }
 
     /* ── Footer ── */
-    footer { padding: 32px 0; border-top: 1px solid var(--border); margin-top: 0; }
-    footer p { font-size: 13px; color: var(--text-caption); margin: 0; }
+    .footer {
+      background: var(--ucl-dark);
+      color: rgba(255,255,255,.7);
+      padding: 32px 24px;
+      margin-top: 0;
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer a { color: rgba(255,255,255,.85); text-decoration: none; }
+    .footer a:hover { color: #fff; }
+    .footer p { color: rgba(255,255,255,.5); font-size: 13px; margin: 0; }
   </style>
 </head>
 <body>
 
-  <!-- ── Header ── -->
-  <header>
-    <div class="container">
-      <div class="header-row">
-        <svg id="ucl-logo" class="header-logo" viewBox="0 0 280 80" xmlns="http://www.w3.org/2000/svg">
-          <text x="0" y="58" font-family="system-ui, sans-serif" font-size="62" font-weight="800" fill="#500778" letter-spacing="-2">UCL</text>
-          <rect x="175" y="5" width="70" height="70" rx="4" fill="#AC10E6"/>
-          <rect x="181" y="40" width="8" height="35" fill="#fff"/>
-          <rect x="193" y="40" width="8" height="35" fill="#fff"/>
-          <rect x="205" y="40" width="8" height="35" fill="#fff"/>
-          <rect x="217" y="40" width="8" height="35" fill="#fff"/>
-          <rect x="229" y="40" width="8" height="35" fill="#fff"/>
-          <path d="M205,38 Q205,15 220,10 Q235,15 235,38 Z" fill="#fff"/>
+  <!-- ── Navigation ── -->
+  <nav class="nav-bar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <svg viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
+          <text x="0" y="38" font-family="-apple-system, sans-serif" font-size="42" font-weight="800" fill="#fff" letter-spacing="-1.5">UCL</text>
+          <rect x="120" y="3" width="44" height="44" rx="3" fill="#AC10E6"/>
+          <rect x="124" y="25" width="5" height="22" fill="#fff"/>
+          <rect x="132" y="25" width="5" height="22" fill="#fff"/>
+          <rect x="140" y="25" width="5" height="22" fill="#fff"/>
+          <rect x="148" y="25" width="5" height="22" fill="#fff"/>
+          <rect x="156" y="25" width="5" height="22" fill="#fff"/>
+          <path d="M142,24 Q142,10 150,6 Q158,10 158,24 Z" fill="#fff"/>
         </svg>
-        <div>
-          <h1 id="institution">University College London</h1>
-          <div class="header-meta">
-            <span id="node-name">UCL Robotics Evidence Node</span>
-            <span id="city">London</span>
-            <span>SONAIR Network</span>
-          </div>
-        </div>
-      </div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#dashboard" class="active">Dashboard</a></li>
+        <li><a href="#motion">Motion Data</a></li>
+        <li><a href="#metric">Sim2Real Metric</a></li>
+        <li><a href="#inbox">Requests</a></li>
+      </ul>
     </div>
-  </header>
+  </nav>
 
-  <div class="container">
+  <!-- ── Hero ── -->
+  <div class="hero">
+    <div class="hero-inner">
+      <h1 id="institution">University College London</h1>
+      <p id="node-name">UCL Robotics Evidence Node — SONAIR National Network</p>
+    </div>
+  </div>
+
+  <div class="content">
 
     <!-- ── About ── -->
-    <section>
+    <section class="section" id="about">
+      <div class="section-label">About the Lab</div>
       <div class="two-col">
         <div>
-          <div class="section-header">
-            <h2>About the Lab</h2>
-          </div>
+          <h2>Robotics &amp; Teleoperation</h2>
           <p>The UCL Robotics Lab focuses on remote teleoperation, sim2real transfer, and networked robot control. We investigate how network latency and jitter affect the fidelity of commands transmitted between simulation environments and physical hardware.</p>
           <p>We are open to collaboration on federated benchmarking, cross-institutional teleoperation experiments, and shared dataset curation for the SONAIR network.</p>
-          <div style="margin-top:16px;">
-            <button class="btn btn-primary" onclick="SONAIR_REQUESTS.openForm('collab')">Apply to Collaborate</button>
-            <button class="btn btn-secondary" style="margin-left:8px;" onclick="SONAIR_REQUESTS.openForm('visit')">Apply to Visit</button>
-          </div>
         </div>
         <div>
-          <div class="section-header">
-            <h2>Equipment &amp; Contact</h2>
-          </div>
-          <h3>UR5e Robot Arm</h3>
-          <p class="caption">6-DOF collaborative robot used in UCL–Nottingham teleoperation experiments. UCL remotely operates the arm while the physical robot is at the University of Nottingham.</p>
-          <div style="margin:12px 0;">
+          <h3>Equipment</h3>
+          <p><strong>UR5e Robot Arm</strong> — 6-DOF collaborative robot used in UCL–Nottingham teleoperation experiments. UCL remotely operates the arm while the physical robot is at the University of Nottingham.</p>
+          <div style="margin: 12px 0 16px;">
             <span class="tag">UR5e</span>
             <span class="tag">Teleoperation</span>
             <span class="tag">RTT Dataset</span>
             <span class="tag">Command Latency</span>
             <span class="tag">Session Audit</span>
           </div>
-          <p style="margin-top:16px;"><strong>Contact:</strong> <a href="mailto:songyutong@ucl.ac.uk">songyutong@ucl.ac.uk</a></p>
+          <h3>Contact</h3>
+          <p><a href="mailto:songyutong@ucl.ac.uk">songyutong@ucl.ac.uk</a></p>
         </div>
       </div>
     </section>
 
     <!-- ── Dashboard ── -->
-    <section>
-      <div class="section-header">
-        <h2>Robot Data Dashboard</h2>
-        <p class="caption">UCL–Nottingham UR5e teleoperation session · 437 seconds · 1,750 RTT samples · 4,220 commands</p>
+    <section class="section" id="dashboard">
+      <div class="section-label">Robot Data Dashboard</div>
+      <h2>Network Performance</h2>
+      <p class="section-desc">UCL–Nottingham UR5e teleoperation session · 437 seconds · 1,750 RTT samples · 4,220 commands</p>
+
+      <div class="stats-strip">
+        <div class="stats-strip-item">
+          <div class="stats-strip-value" id="stat-mean-rtt">—</div>
+          <div class="stats-strip-label">Mean RTT</div>
+        </div>
+        <div class="stats-strip-item">
+          <div class="stats-strip-value" id="stat-p95-rtt">—</div>
+          <div class="stats-strip-label">P95 RTT</div>
+        </div>
+        <div class="stats-strip-item">
+          <div class="stats-strip-value" id="stat-mean-latency">—</div>
+          <div class="stats-strip-label">Mean Cmd Latency</div>
+        </div>
+        <div class="stats-strip-item">
+          <div class="stats-strip-value" id="stat-packet-loss">—</div>
+          <div class="stats-strip-label">Packet Loss</div>
+        </div>
+        <div class="stats-strip-item">
+          <div class="stats-strip-value" id="stat-s2r-score">—</div>
+          <div class="stats-strip-label">TFI Score</div>
+        </div>
       </div>
 
-      <div class="stats-row">
-        <div class="stat-item">
-          <div class="stat-value" id="stat-mean-rtt">—</div>
-          <div class="stat-label">Mean RTT</div>
+      <h3>Round-Trip Time</h3>
+      <p style="color:var(--grey);font-size:14px;">Network RTT between UCL (sender) and Nottingham (receiver) over 437 seconds.</p>
+      <div class="chart-area"><canvas id="rtt-chart"></canvas></div>
+
+      <h3 style="margin-top:36px;">Command Latency Distribution</h3>
+      <p style="color:var(--grey);font-size:14px;">Relay round-trip times for 4,220 commands. Purple = normal, amber = elevated, red = high.</p>
+      <div class="chart-area" style="height:260px;"><canvas id="latency-chart"></canvas></div>
+
+      <h3 style="margin-top:36px;">Interpretation</h3>
+      <div class="highlight-block">
+        <p><strong>Network stability.</strong> Mean RTT of ~55 ms with a range of 14–401 ms indicates generally responsive conditions, but with significant outlier spikes. The P95 value shows 5% of measurements exceed a much higher threshold, suggesting intermittent congestion on the UCL–Nottingham link.</p>
+        <p><strong>Command latency.</strong> The histogram clusters tightly around 20–40 ms — acceptable for non-safety-critical teleoperation. A long tail beyond 100 ms means some commands experience delays that could cause visible desynchronisation between operator input and robot response.</p>
+        <p><strong>Sim2real implication.</strong> In simulation, commands execute instantaneously. In reality, variable latency introduces a timing gap. A trajectory planned at 50 Hz assumes each command arrives within 20 ms, but the network delivers with ~25 ms standard deviation. The physical robot diverges from the simulated trajectory, particularly during fast motions.</p>
+        <p><strong>Session events.</strong> The audit log shows a burst of <code>link_degraded</code> rejections near t=420 s, correlating with RTT spikes. Network instability directly impacts teleoperation reliability.</p>
+      </div>
+    </section>
+
+    <!-- ── Motion Data ── -->
+    <section class="section" id="motion">
+      <div class="section-label">Robot Motion Data</div>
+      <h2>UR5e Teleoperation Motion</h2>
+      <p class="section-desc">End-effector (TCP) position and joint angles recorded at 5 Hz · 712 TCP samples · 717 joint samples · 2,128 operations</p>
+
+      <div class="two-col">
+        <div>
+          <h3>Operation Breakdown</h3>
+          <p style="color:var(--grey);font-size:14px;">Commands sent to the UR5e during the session.</p>
+          <div class="chart-area" style="height:220px;"><canvas id="ops-chart"></canvas></div>
         </div>
-        <div class="stat-item">
-          <div class="stat-value" id="stat-p95-rtt">—</div>
-          <div class="stat-label">P95 RTT</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="stat-mean-latency">—</div>
-          <div class="stat-label">Mean Cmd Latency</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="stat-packet-loss">—</div>
-          <div class="stat-label">Packet Loss</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="stat-s2r-score">—</div>
-          <div class="stat-label">TFI Score</div>
+        <div>
+          <h3>TCP End-Effector Speed</h3>
+          <p style="color:var(--grey);font-size:14px;">Cartesian speed of the tool tip, derived from consecutive TCP samples.</p>
+          <div class="chart-area" style="height:220px;"><canvas id="speed-chart"></canvas></div>
         </div>
       </div>
 
-      <!-- RTT chart -->
-      <h3>Round-Trip Time Over Session</h3>
-      <p class="caption">Network RTT measured between UCL (sender) and Nottingham (receiver) over 437 seconds.</p>
-      <div class="chart-wrap">
-        <canvas id="rtt-chart"></canvas>
-      </div>
+      <h3 style="margin-top:36px;">TCP Trajectory (XY Plane)</h3>
+      <p style="color:var(--grey);font-size:14px;">Top-down view of the end-effector path. Colour shifts from dark to light along the timeline.</p>
+      <div class="chart-area" style="height:340px;"><canvas id="trajectory-chart"></canvas></div>
 
-      <!-- Latency histogram -->
-      <h3 style="margin-top:32px;">Command Latency Distribution</h3>
-      <p class="caption">Histogram of relay round-trip times for 4,220 commands. Colour indicates severity: normal (&lt;60 ms), elevated (60–100 ms), high (&gt;100 ms).</p>
-      <div class="chart-wrap" style="height:260px;">
-        <canvas id="latency-chart"></canvas>
-      </div>
+      <h3 style="margin-top:36px;">Joint Angles</h3>
+      <p style="color:var(--grey);font-size:14px;">All six joint angles (degrees) over the session.</p>
+      <div class="chart-area" style="height:300px;"><canvas id="joint-chart"></canvas></div>
 
-      <!-- Interpretation -->
-      <h3 style="margin-top:32px;">Interpretation</h3>
-      <div class="interp">
-        <p><strong>Network stability.</strong> The mean RTT of ~55 ms with a range of 14–401 ms indicates generally responsive conditions, but with significant outlier spikes. The P95 value shows that 5% of measurements exceed a much higher threshold, suggesting intermittent congestion on the UCL–Nottingham link.</p>
-        <p><strong>Command latency.</strong> The histogram clusters tightly around 20–40 ms for the majority of commands — acceptable for non-safety-critical teleoperation. However, a long tail beyond 100 ms means some commands experience delays that could cause visible desynchronisation between operator input and robot response.</p>
-        <p><strong>Sim2real implication.</strong> In simulation, commands execute instantaneously. In the real setup, variable latency introduces a timing gap. A trajectory planned at 50 Hz assumes each command arrives within 20 ms, but the network delivers with a standard deviation of ~25 ms. The physical robot's trajectory will diverge from the simulated one, particularly during high-speed motions.</p>
-        <p><strong>Session events.</strong> The audit log shows a burst of <code>link_degraded</code> rejections near t=420 s, correlating with RTT spikes in the time-series. Network instability directly impacts teleoperation reliability.</p>
+      <h3 style="margin-top:36px;">Motion Interpretation</h3>
+      <div class="highlight-block">
+        <p><strong>Trajectory pattern.</strong> The TCP trajectory shows the robot operated within a compact workspace, with the end-effector moving primarily in the XY plane. Clusters indicate repeated positioning tasks or fine adjustments during teleoperation.</p>
+        <p><strong>Speed profile.</strong> Speed varies significantly — periods of near-zero speed alternate with faster movements. Speed spikes reveal rapid repositioning commands, the most latency-sensitive phases for sim2real fidelity.</p>
+        <p><strong>Joint coordination.</strong> Joint angles show coordinated multi-joint motion, confirming active manipulation. The joint data captures the robot's configuration space, complementing the Cartesian TCP view.</p>
+        <p><strong>Sim2real relevance.</strong> Combined with RTT data, motion data reveals which movements coincide with latency spikes. High-speed motions during high-latency periods represent the worst-case sim2real gap.</p>
       </div>
     </section>
 
     <!-- ── Challenge 1: TFI Metric ── -->
-    <section>
-      <div class="section-header">
-        <h2>Sim2Real Gap Metric — Temporal Fidelity Index</h2>
-        <p class="caption">Challenge 1: A novel metric to quantify the simulation-to-real timing gap for networked teleoperation.</p>
-      </div>
+    <section class="section" id="metric">
+      <div class="section-label">Challenge 1</div>
+      <h2>Sim2Real Gap Metric — Temporal Fidelity Index</h2>
+      <p class="section-desc">A novel metric to quantify the simulation-to-real timing gap for networked teleoperation.</p>
 
       <p>We propose the <strong>Temporal Fidelity Index (TFI)</strong> — a composite metric that captures how faithfully a real networked teleoperation system reproduces the timing assumptions of its simulation counterpart. Existing sim2real metrics focus on positional or visual accuracy; TFI targets the <em>temporal</em> dimension.</p>
 
-      <h3 style="margin-top:24px;">Definition</h3>
-      <div class="formula-block">
-        TFI = (1 − D<sub>norm</sub>) × (1 − J<sub>norm</sub>) × (1 − L<sub>rate</sub>)
-      </div>
+      <h3 style="margin-top:28px;">Definition</h3>
+      <div class="formula">TFI = (1 − D<sub>norm</sub>) × (1 − J<sub>norm</sub>) × (1 − L<sub>rate</sub>)</div>
       <ul class="def-list">
-        <li><strong>D<sub>norm</sub></strong> — normalised mean excess delay = mean(RTT) / max(RTT). Measures average delay relative to worst case.</li>
-        <li><strong>J<sub>norm</sub></strong> — normalised jitter = std(RTT) / max(RTT). Captures timing unpredictability.</li>
-        <li><strong>L<sub>rate</sub></strong> — packet loss rate = lost / total. Measures data loss.</li>
+        <li><strong>D<sub>norm</sub></strong> — normalised mean excess delay = mean(RTT) / max(RTT).</li>
+        <li><strong>J<sub>norm</sub></strong> — normalised jitter = std(RTT) / max(RTT).</li>
+        <li><strong>L<sub>rate</sub></strong> — packet loss rate = lost / total.</li>
       </ul>
 
       <h3>Calculated Result</h3>
-      <div class="stats-row">
-        <div class="stat-item">
-          <div class="stat-value" id="metric-dnorm">—</div>
-          <div class="stat-label">D<sub>norm</sub></div>
+      <div class="stats-strip" style="grid-template-columns: repeat(4,1fr);">
+        <div class="stats-strip-item">
+          <div class="stats-strip-value" id="metric-dnorm">—</div>
+          <div class="stats-strip-label">D<sub>norm</sub></div>
         </div>
-        <div class="stat-item">
-          <div class="stat-value" id="metric-jnorm">—</div>
-          <div class="stat-label">J<sub>norm</sub></div>
+        <div class="stats-strip-item">
+          <div class="stats-strip-value" id="metric-jnorm">—</div>
+          <div class="stats-strip-label">J<sub>norm</sub></div>
         </div>
-        <div class="stat-item">
-          <div class="stat-value" id="metric-lrate">—</div>
-          <div class="stat-label">L<sub>rate</sub></div>
+        <div class="stats-strip-item">
+          <div class="stats-strip-value" id="metric-lrate">—</div>
+          <div class="stats-strip-label">L<sub>rate</sub></div>
         </div>
-        <div class="stat-item">
-          <div class="stat-value" id="metric-tfi">—</div>
-          <div class="stat-label">TFI</div>
+        <div class="stats-strip-item">
+          <div class="stats-strip-value" id="metric-tfi">—</div>
+          <div class="stats-strip-label">TFI</div>
         </div>
       </div>
 
       <h3>TFI Over Time</h3>
-      <p class="caption">Rolling-window TFI (window = 50 samples) across the session. Dips correspond to latency spikes and link degradation events.</p>
-      <div class="chart-wrap" style="height:240px;">
-        <canvas id="tfi-chart"></canvas>
-      </div>
+      <p style="color:var(--grey);font-size:14px;">Rolling-window TFI (window = 50 samples). Dips correspond to latency spikes and link degradation.</p>
+      <div class="chart-area" style="height:240px;"><canvas id="tfi-chart"></canvas></div>
 
       <h3 style="margin-top:28px;">Why It Matters</h3>
-      <p>For teleoperation, timing fidelity is often more critical than positional accuracy — delayed commands accumulate into trajectory divergence. A robot trajectory planned in simulation at 50 Hz assumes each command arrives within 20 ms, but the real network introduces variable delays that compound over time.</p>
+      <p>For teleoperation, timing fidelity is often more critical than positional accuracy — delayed commands accumulate into trajectory divergence. A trajectory planned at 50 Hz assumes each command arrives within 20 ms, but the real network introduces variable delays that compound over time.</p>
 
       <h3 style="margin-top:20px;">Adoption Across SONAIR</h3>
-      <p>TFI can be computed for any teleoperation session that logs RTT and packet loss. Each campus node could publish its TFI alongside raw data, enabling cross-institutional comparison. Over time, a TFI benchmark could identify bottleneck links and establish minimum fidelity thresholds for safety-critical applications.</p>
+      <p>TFI can be computed for any teleoperation session that logs RTT and packet loss. Each campus node could publish its TFI alongside raw data, enabling cross-institutional comparison and establishing minimum fidelity thresholds for safety-critical applications.</p>
     </section>
 
     <!-- ── Requests Inbox ── -->
-    <section>
-      <div class="section-header">
-        <h2>Requests Inbox</h2>
-        <p class="caption">Access or collaboration requests routed to the UCL campus node appear here.</p>
-      </div>
+    <section class="section" id="inbox">
+      <div class="section-label">Collaboration</div>
+      <h2>Requests Inbox</h2>
+      <p class="section-desc">Access or collaboration requests routed to the UCL campus node.</p>
       <div id="requests-inbox"></div>
     </section>
 
   </div>
 
-  <footer>
-    <div class="container">
-      <p>UCL Robotics Evidence Node · SONAIR Network · <a href="mailto:songyutong@ucl.ac.uk">songyutong@ucl.ac.uk</a></p>
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <a href="#">UCL Robotics Evidence Node</a>
+        <p style="margin-top:4px;">Part of the SONAIR National Network</p>
+      </div>
+      <div>
+        <a href="mailto:songyutong@ucl.ac.uk">songyutong@ucl.ac.uk</a>
+        <p style="margin-top:4px;">&copy; 2026 University College London</p>
+      </div>
     </div>
   </footer>
 
@@ -312,10 +461,9 @@
     fetch('theme.config.json', { cache: 'no-store' })
       .then(r => r.json())
       .then(config => {
-        document.documentElement.style.setProperty('--primary', config.primary_color || '#500778');
+        document.documentElement.style.setProperty('--ucl-dark', config.primary_color || '#500778');
         document.getElementById('institution').textContent = config.institution_name || 'University College London';
-        document.getElementById('node-name').textContent = config.node_name || 'UCL Robotics Evidence Node';
-        document.getElementById('city').textContent = config.city || 'London';
+        document.getElementById('node-name').textContent = (config.node_name || 'UCL Robotics Evidence Node') + ' — SONAIR National Network';
         document.title = (config.institution_name || 'UCL') + ' — SONAIR Sub-Portal';
       })
       .catch(() => console.warn('theme.config.json could not be loaded'));
@@ -329,8 +477,9 @@
   <script src="sonair_request_system.js"></script>
   <script>SONAIR_REQUESTS.renderInbox('requests-inbox');</script>
 
-  <!-- Data & Dashboard -->
+  <!-- Data -->
   <script src="data.js"></script>
+  <script src="motion_data.js"></script>
   <script>
     const rtts = RTT_DATA.map(d => d.rtt);
     const meanRTT = rtts.reduce((a,b) => a+b, 0) / rtts.length;
@@ -338,10 +487,8 @@
     const p95RTT = sortedRTTs[Math.floor(sortedRTTs.length * 0.95)];
     const stdRTT = Math.sqrt(rtts.reduce((s,v) => s + (v - meanRTT)**2, 0) / rtts.length);
     const maxRTT = Math.max(...rtts);
-
     const latencies = CMD_DATA.map(d => d.latency);
     const meanLatency = latencies.reduce((a,b) => a+b, 0) / latencies.length;
-
     const lostCount = RTT_DATA.filter(d => d.lost > 0).length;
     const lossRate = lostCount / RTT_DATA.length;
 
@@ -361,97 +508,130 @@
     document.getElementById('metric-lrate').textContent = L_rate.toFixed(3);
     document.getElementById('metric-tfi').textContent = TFI.toFixed(3);
 
-    const chartFont = { family: "system-ui, -apple-system, sans-serif" };
-    const gridColor = '#E5E5E5';
-    const tickColor = '#999';
+    const cFont = { family: "-apple-system, sans-serif" };
+    const cGrid = '#E5E5E5';
+    const cTick = '#999';
+    const cPurple = '#500778';
 
-    // RTT time-series
+    // RTT
     new Chart(document.getElementById('rtt-chart'), {
       type: 'line',
-      data: {
-        labels: RTT_DATA.map(d => d.ts.toFixed(1)),
-        datasets: [{
-          label: 'RTT (ms)',
-          data: RTT_DATA.map(d => d.rtt),
-          borderColor: '#500778',
-          backgroundColor: 'rgba(80,7,120,.06)',
-          borderWidth: 1,
-          pointRadius: 0,
-          fill: true,
-          tension: 0.2
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
+      data: { labels: RTT_DATA.map(d => d.ts.toFixed(1)), datasets: [{
+        data: RTT_DATA.map(d => d.rtt), borderColor: cPurple, backgroundColor: 'rgba(80,7,120,.05)',
+        borderWidth: 1, pointRadius: 0, fill: true, tension: 0.2
+      }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
         scales: {
-          x: { title: { display: true, text: 'Time (s)', color: tickColor, font: chartFont }, ticks: { color: tickColor, maxTicksLimit: 14, font: { size: 11 }, callback(v,i) { return RTT_DATA[i] ? RTT_DATA[i].ts.toFixed(0)+'s' : ''; } }, grid: { color: gridColor } },
-          y: { title: { display: true, text: 'RTT (ms)', color: tickColor, font: chartFont }, ticks: { color: tickColor, font: { size: 11 } }, grid: { color: gridColor } }
+          x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 14, font: { size: 11 }, callback(v,i) { return RTT_DATA[i] ? RTT_DATA[i].ts.toFixed(0)+'s' : ''; } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'RTT (ms)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid } }
         }
       }
     });
 
-    // Command latency histogram
+    // Latency histogram
     const bins = [], binSize = 10, maxLat = Math.max(...latencies);
     for (let i = 0; i <= maxLat + binSize; i += binSize) bins.push(i);
-    const histCounts = new Array(bins.length - 1).fill(0);
-    latencies.forEach(v => { histCounts[Math.min(Math.floor(v / binSize), histCounts.length - 1)]++; });
-
+    const hc = new Array(bins.length - 1).fill(0);
+    latencies.forEach(v => { hc[Math.min(Math.floor(v / binSize), hc.length - 1)]++; });
     new Chart(document.getElementById('latency-chart'), {
       type: 'bar',
-      data: {
-        labels: histCounts.map((_, i) => bins[i] + '–' + bins[i+1]),
-        datasets: [{
-          label: 'Count',
-          data: histCounts,
-          backgroundColor: histCounts.map((_, i) => {
-            const mid = bins[i] + binSize/2;
-            return mid > 100 ? '#D64545' : mid > 60 ? '#E0A030' : '#500778';
-          }),
-          borderRadius: 3
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
+      data: { labels: hc.map((_, i) => bins[i]+'–'+bins[i+1]), datasets: [{
+        data: hc, backgroundColor: hc.map((_,i) => { const m=bins[i]+5; return m>100?'#D64545':m>60?'#E0A030':cPurple; }), borderRadius: 3
+      }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
         scales: {
-          x: { title: { display: true, text: 'Latency (ms)', color: tickColor, font: chartFont }, ticks: { color: tickColor, font: { size: 11 }, maxRotation: 45 }, grid: { display: false } },
-          y: { title: { display: true, text: 'Count', color: tickColor, font: chartFont }, ticks: { color: tickColor, font: { size: 11 } }, grid: { color: gridColor } }
+          x: { title: { display: true, text: 'Latency (ms)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 }, maxRotation: 45 }, grid: { display: false } },
+          y: { title: { display: true, text: 'Count', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid } }
         }
       }
     });
 
-    // TFI rolling window
-    const windowSize = 50, tfiTimeline = [];
-    for (let i = windowSize; i < RTT_DATA.length; i++) {
-      const w = RTT_DATA.slice(i - windowSize, i).map(d => d.rtt);
-      const wM = w.reduce((a,b)=>a+b,0)/w.length;
-      const wS = Math.sqrt(w.reduce((s,v)=>s+(v-wM)**2,0)/w.length);
-      const wL = RTT_DATA.slice(i-windowSize,i).filter(d=>d.lost>0).length/windowSize;
-      tfiTimeline.push({ ts: RTT_DATA[i].ts, tfi: (1-wM/maxRTT)*(1-wS/maxRTT)*(1-wL) });
+    // TFI rolling
+    const ws = 50, tfiT = [];
+    for (let i = ws; i < RTT_DATA.length; i++) {
+      const w = RTT_DATA.slice(i-ws,i).map(d=>d.rtt);
+      const m = w.reduce((a,b)=>a+b,0)/w.length;
+      const s = Math.sqrt(w.reduce((x,v)=>x+(v-m)**2,0)/w.length);
+      const l = RTT_DATA.slice(i-ws,i).filter(d=>d.lost>0).length/ws;
+      tfiT.push({ ts: RTT_DATA[i].ts, v: (1-m/maxRTT)*(1-s/maxRTT)*(1-l) });
     }
-
     new Chart(document.getElementById('tfi-chart'), {
       type: 'line',
-      data: {
-        labels: tfiTimeline.map(d => d.ts.toFixed(0)),
-        datasets: [{
-          label: 'TFI',
-          data: tfiTimeline.map(d => d.tfi),
-          borderColor: '#500778',
-          backgroundColor: 'rgba(80,7,120,.04)',
-          borderWidth: 1.5,
-          pointRadius: 0,
-          fill: true,
-          tension: 0.3
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
+      data: { labels: tfiT.map(d=>d.ts.toFixed(0)), datasets: [{
+        data: tfiT.map(d=>d.v), borderColor: cPurple, backgroundColor: 'rgba(80,7,120,.04)',
+        borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3
+      }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
         scales: {
-          x: { title: { display: true, text: 'Time (s)', color: tickColor, font: chartFont }, ticks: { color: tickColor, maxTicksLimit: 12, font: { size: 11 }, callback(v,i) { return tfiTimeline[i] ? tfiTimeline[i].ts.toFixed(0)+'s' : ''; } }, grid: { color: gridColor } },
-          y: { title: { display: true, text: 'TFI', color: tickColor, font: chartFont }, ticks: { color: tickColor, font: { size: 11 } }, grid: { color: gridColor }, min: 0, max: 1 }
+          x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 12, font: { size: 11 }, callback(v,i) { return tfiT[i]?tfiT[i].ts.toFixed(0)+'s':''; } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'TFI', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0, max: 1 }
+        }
+      }
+    });
+
+    // Operations doughnut
+    const oL = Object.keys(OP_SUMMARY), oV = Object.values(OP_SUMMARY);
+    new Chart(document.getElementById('ops-chart'), {
+      type: 'doughnut',
+      data: { labels: oL, datasets: [{ data: oV, backgroundColor: ['#500778','#AC10E6','#D1B2E0','#00BDF2','#E0A030'], borderWidth: 0 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: cTick, font: { size: 11 }, padding: 12 } } } }
+    });
+
+    // TCP speed
+    const spd = [];
+    for (let i = 1; i < TCP_DATA.length; i++) {
+      const dt = TCP_DATA[i].ts - TCP_DATA[i-1].ts;
+      if (dt <= 0) continue;
+      const dx=TCP_DATA[i].x-TCP_DATA[i-1].x, dy=TCP_DATA[i].y-TCP_DATA[i-1].y, dz=TCP_DATA[i].z-TCP_DATA[i-1].z;
+      spd.push({ ts: TCP_DATA[i].ts, v: Math.sqrt(dx*dx+dy*dy+dz*dz)/dt*1000 });
+    }
+    new Chart(document.getElementById('speed-chart'), {
+      type: 'line',
+      data: { labels: spd.map(d=>d.ts.toFixed(0)), datasets: [{
+        data: spd.map(d=>d.v), borderColor: '#AC10E6', backgroundColor: 'rgba(172,16,230,.05)',
+        borderWidth: 1, pointRadius: 0, fill: true, tension: 0.3
+      }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 10, font: { size: 11 }, callback(v,i) { return spd[i]?spd[i].ts.toFixed(0)+'s':''; } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'Speed (mm/s)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid } }
+        }
+      }
+    });
+
+    // Trajectory scatter
+    new Chart(document.getElementById('trajectory-chart'), {
+      type: 'scatter',
+      data: { datasets: [{
+        data: TCP_DATA.map(d=>({ x: d.x*1000, y: d.y*1000 })),
+        pointRadius: 2.5, pointBorderWidth: 0,
+        pointBackgroundColor: TCP_DATA.map((_,i) => {
+          const t=i/TCP_DATA.length;
+          return `rgb(${Math.round(80+t*92)},${Math.round(7+t*9)},${Math.round(120+t*110)})`;
+        })
+      }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'X (mm)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'Y (mm)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid } }
+        }
+      }
+    });
+
+    // Joint angles
+    const jC = ['#500778','#AC10E6','#00BDF2','#8C2DA7','#B5B5B5','#E0A030'];
+    new Chart(document.getElementById('joint-chart'), {
+      type: 'line',
+      data: { labels: JOINT_DATA.map(d=>d.ts.toFixed(0)),
+        datasets: ['J0','J1','J2','J3','J4','J5'].map((n,i) => ({
+          label: n, data: JOINT_DATA.map(d=>d['q'+i]), borderColor: jC[i], borderWidth: 1, pointRadius: 0, tension: 0.2
+        }))
+      },
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: cTick, font: { size: 11 }, usePointStyle: true, padding: 14 } } },
+        scales: {
+          x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 12, font: { size: 11 }, callback(v,i) { return JOINT_DATA[i]?JOINT_DATA[i].ts.toFixed(0)+'s':''; } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'Angle (°)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid } }
         }
       }
     });
