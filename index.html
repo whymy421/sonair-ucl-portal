@@ -668,6 +668,8 @@
               <option value="1" selected>1x</option>
               <option value="2">2x</option>
               <option value="4">4x</option>
+              <option value="8">8x</option>
+              <option value="16">16x</option>
             </select>
           </div>
         </div>
@@ -747,109 +749,57 @@
         </article>
       </div>
 
-      <div class="section-label" style="margin-top:28px;">Metric 1 · Network</div>
-      <h2>Network Fidelity Index (NFI)</h2>
-      <p>The <strong>Network Fidelity Index</strong> captures how faithfully the real teleoperation link reproduces the timing assumptions of simulation. Higher values indicate lower delay, lower jitter, and fewer lost packets.</p>
-
-      <h3 style="margin-top:28px;">Definition</h3>
-      <div class="formula">NFI = (1 − D<sub>norm</sub>) × (1 − J<sub>norm</sub>) × (1 − L<sub>rate</sub>)</div>
-      <ul class="def-list">
-        <li><strong>D<sub>norm</sub></strong> — normalised mean excess delay = mean(RTT) / max(RTT).</li>
-        <li><strong>J<sub>norm</sub></strong> — normalised jitter = std(RTT) / max(RTT).</li>
-        <li><strong>L<sub>rate</sub></strong> — packet loss rate = lost / total.</li>
-      </ul>
-
-      <h3>Calculated Result</h3>
-      <div class="stats-strip" style="grid-template-columns: repeat(4,1fr);">
-        <div class="stats-strip-item">
-          <div class="stats-strip-value" id="metric-dnorm">—</div>
-          <div class="stats-strip-label">D<sub>norm</sub></div>
-        </div>
-        <div class="stats-strip-item">
-          <div class="stats-strip-value" id="metric-jnorm">—</div>
-          <div class="stats-strip-label">J<sub>norm</sub></div>
-        </div>
-        <div class="stats-strip-item">
-          <div class="stats-strip-value" id="metric-lrate">—</div>
-          <div class="stats-strip-label">L<sub>rate</sub></div>
-        </div>
-        <div class="stats-strip-item">
-          <div class="stats-strip-value" id="metric-nfi">—</div>
-          <div class="stats-strip-label">NFI</div>
-        </div>
-      </div>
-
-      <h3>NFI Over Time</h3>
-      <p style="color:var(--grey);font-size:14px;">Rolling-window NFI (window = 50 samples). Dips correspond to latency spikes and link degradation.</p>
-      <div class="chart-area" style="height:240px;"><canvas id="nfi-chart"></canvas></div>
-
-      <h3 style="margin-top:28px;">Why It Matters</h3>
-      <p>For teleoperation, timing fidelity is often more critical than positional accuracy — delayed commands accumulate into trajectory divergence. A trajectory planned at 50 Hz assumes each command arrives within 20 ms, but the real network introduces variable delays that compound over time.</p>
-
-      <div class="section-label" style="margin-top:52px;">Metric 2 · Motion</div>
-      <h2>Target–Actual Tracking Fidelity (TAF)</h2>
-      <p>The <strong>Target–Actual Tracking Fidelity</strong> directly compares commanded and measured robot motion in the AURSAD benchmark subset. Unlike the earlier FFT approach, it measures control error and response delay rather than assuming that all high-frequency movement is noise.</p>
-
-      <h3 style="margin-top:28px;">Definition</h3>
-      <div class="formula">TAF = 1 − (P<sub>norm</sub> + O<sub>norm</sub> + J<sub>norm</sub> + L<sub>norm</sub>) / 4</div>
-      <ul class="def-list">
-        <li><strong>P<sub>norm</sub></strong> — TCP position RMSE / 1 mm reference bound.</li>
-        <li><strong>O<sub>norm</sub></strong> — TCP orientation RMSE / 0.5° reference bound.</li>
-        <li><strong>J<sub>norm</sub></strong> — six-joint RMSE / 0.5° reference bound.</li>
-        <li><strong>L<sub>norm</sub></strong> — target-to-actual response lag / 50 ms reference bound.</li>
-      </ul>
-
-      <h3>Calculated Result</h3>
-      <div class="stats-strip" style="grid-template-columns: repeat(4,1fr);">
-        <div class="stats-strip-item">
-          <div class="stats-strip-value" id="metric-position-rmse">—</div>
-          <div class="stats-strip-label">Position RMSE</div>
-        </div>
-        <div class="stats-strip-item">
-          <div class="stats-strip-value" id="metric-orientation-rmse">—</div>
-          <div class="stats-strip-label">Orientation RMSE</div>
-        </div>
-        <div class="stats-strip-item">
-          <div class="stats-strip-value" id="metric-tracking-lag">—</div>
-          <div class="stats-strip-label">Median Lag</div>
-        </div>
-        <div class="stats-strip-item">
-          <div class="stats-strip-value" id="metric-taf">—</div>
-          <div class="stats-strip-label">TAF</div>
-        </div>
-      </div>
-
+      <!-- Combined Metrics -->
       <div class="chart-grid">
         <div class="chart-card">
-          <h3>TCP Position Tracking Error Over Time</h3>
-          <p style="color:var(--grey);font-size:14px;">Three-dimensional distance between target and actual TCP position during representative normal operation 23. Lower is better.</p>
-          <div class="chart-area" style="height:320px;"><canvas id="tracking-error-chart"></canvas></div>
+          <div class="stats-strip" style="grid-template-columns: 1fr; margin: 0 0 16px;">
+            <div class="stats-strip-item" style="border:none;">
+              <div class="stats-strip-value" id="metric-nfi" style="font-size:2rem;">—</div>
+              <div class="stats-strip-label">NFI · Network Fidelity</div>
+            </div>
+          </div>
+          <div class="formula" style="font-size:13px; padding:10px 16px;">NFI = (1 − D<sub>norm</sub>) × (1 − J<sub>norm</sub>) × (1 − L<sub>rate</sub>)</div>
+          <div class="stats-strip" style="grid-template-columns: repeat(3,1fr); margin:12px 0 0;">
+            <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-dnorm">—</div><div class="stats-strip-label">D<sub>norm</sub></div></div>
+            <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-jnorm">—</div><div class="stats-strip-label">J<sub>norm</sub></div></div>
+            <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-lrate">—</div><div class="stats-strip-label">L<sub>rate</sub></div></div>
+          </div>
         </div>
         <div class="chart-card">
-          <h3>Overall TAF Score</h3>
-          <p style="color:var(--grey);font-size:14px;">A simple 0–1 summary: 1.000 is perfect target following; a higher score means more faithful robot motion.</p>
-          <div class="score-chart-wrap">
-            <canvas id="taf-score-chart"></canvas>
-            <div class="score-chart-centre">
-              <div class="score-chart-value" id="taf-score-centre">—</div>
-              <div class="score-chart-total">out of 1.000</div>
+          <div class="stats-strip" style="grid-template-columns: 1fr; margin: 0 0 16px;">
+            <div class="stats-strip-item" style="border:none;">
+              <div class="stats-strip-value" id="metric-taf" style="font-size:2rem;">—</div>
+              <div class="stats-strip-label">TAF · Tracking Fidelity</div>
             </div>
+          </div>
+          <div class="formula" style="font-size:13px; padding:10px 16px;">TAF = 1 − (P<sub>norm</sub> + O<sub>norm</sub> + J<sub>norm</sub> + L<sub>norm</sub>) / 4</div>
+          <div class="stats-strip" style="grid-template-columns: repeat(3,1fr); margin:12px 0 0;">
+            <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-position-rmse">—</div><div class="stats-strip-label">Position RMSE</div></div>
+            <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-orientation-rmse">—</div><div class="stats-strip-label">Ori RMSE</div></div>
+            <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-tracking-lag">—</div><div class="stats-strip-label">Median Lag</div></div>
           </div>
         </div>
       </div>
 
-      <div class="interp-card" onclick="this.classList.toggle('open')">
+      <div class="chart-card" style="margin-top:24px;">
+        <h3>NFI vs TAF Over Time</h3>
+        <p style="color:var(--grey);font-size:14px;">Network fidelity (purple) and tracking fidelity (blue) on the same 437 s timeline. Both use a 0–1 scale; higher = better.</p>
+        <div class="chart-area" style="height:300px;"><canvas id="combined-metric-chart"></canvas></div>
+      </div>
+
+      <div class="interp-card" onclick="this.classList.toggle('open')" style="margin-top:24px;">
         <div class="interp-card-header">
           <div>
             <h3>Interpretation</h3>
-            <p class="interp-card-summary">Tracking accuracy evidence and cross-campus adoption for SONAIR network.</p>
+            <p class="interp-card-summary">How NFI and TAF work together to quantify the sim2real gap across SONAIR.</p>
           </div>
           <div class="interp-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
         </div>
         <div class="interp-card-detail">
-          <p><strong>Tracking evidence.</strong> Across 212,433 samples, TCP position RMSE is 0.137 mm, orientation RMSE is 0.0206°, joint RMSE is 0.0102°, and the typical target-to-actual lag is 10 ms. The resulting TAF is approximately 0.900.</p>
-          <p><strong>Important limitation.</strong> Normal and faulty assembly outcomes have similar tracking scores. Missing screws or damaged threads are process faults, not necessarily controller faults. TAF therefore measures robot control fidelity; it should be combined with task-force, vision, or assembly-state evidence for fault detection.</p>
-          <p><strong>Adoption across SONAIR.</strong> NFI and TAF share the same 0–1 format, separating network timing quality from robot target-following quality without labelling genuine fast motion as noise.</p>
+          <p><strong>Network timing.</strong> For teleoperation, timing fidelity is often more critical than positional accuracy — delayed commands accumulate into trajectory divergence.</p>
+          <p><strong>Tracking evidence.</strong> Across 212,433 samples, TCP position RMSE is 0.137 mm, orientation RMSE is 0.0206°, and the typical target-to-actual lag is 10 ms.</p>
+          <p><strong>Important limitation.</strong> Normal and faulty assembly outcomes have similar tracking scores. TAF measures robot control fidelity; it should be combined with task-force, vision, or assembly-state evidence for fault detection.</p>
+          <p><strong>Adoption across SONAIR.</strong> NFI and TAF share the same 0–1 format, separating network timing quality from robot target-following quality.</p>
         </div>
       </div>
     </section>
@@ -905,6 +855,7 @@
   <script src="data.js"></script>
   <script src="motion_data.js"></script>
   <script src="tracking_fidelity.js"></script>
+  <script src="tracking_error_data.js"></script> <!-- TAF_TIMELINE_DATA -->
   <script src="motion_player.js"></script>
   <script>
     const rtts = RTT_DATA.map(d => d.rtt);
@@ -1034,50 +985,39 @@
       const l = RTT_DATA.slice(i-ws,i).filter(d=>d.lost>0).length/ws;
       nfiT.push({ ts: RTT_DATA[i].ts, v: (1-m/maxRTT)*(1-s/maxRTT)*(1-l) });
     }
-    new Chart(document.getElementById('nfi-chart'), {
-      type: 'line',
-      data: { labels: nfiT.map(d=>d.ts.toFixed(0)), datasets: [{
-        data: nfiT.map(d=>d.v), borderColor: cPurple, backgroundColor: 'rgba(80,7,120,.04)',
-        borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3
-      }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-        scales: {
-          x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 12, font: { size: 11 }, callback(v,i) { return nfiT[i]?nfiT[i].ts.toFixed(0)+'s':''; } }, grid: { color: cGrid } },
-          y: { title: { display: true, text: 'NFI', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0, max: 1 }
-        }
-      }
+    // Combined NFI + TAF (same Y-axis 0-1, 437s timeline)
+    const combinedLabels = Array.from({length: 437}, (_, i) => i);
+    const nfiBins = Array.from({length: 437}, (_, sec) => {
+      const match = nfiT.filter(d => Math.floor(d.ts) === sec);
+      return match.length ? match.reduce((a, d) => a + d.v, 0) / match.length : null;
     });
-
-    const examplePath = TRACKING_FIDELITY.example_trajectory;
-    const trackingError = examplePath.map(d => {
-      const dx = d.actual_x - d.target_x;
-      const dy = d.actual_y - d.target_y;
-      const dz = d.actual_z - d.target_z;
-      return Math.sqrt(dx * dx + dy * dy + dz * dz);
-    });
-    new Chart(document.getElementById('tracking-error-chart'), {
+    new Chart(document.getElementById('combined-metric-chart'), {
       type: 'line',
       data: {
-        labels: examplePath.map(d=>d.t),
+        labels: combinedLabels,
         datasets: [{
-          label: '3D position error',
-          data: trackingError,
-          borderColor: cPurple,
-          backgroundColor: 'rgba(80,7,120,.10)',
-          borderWidth: 2,
-          pointRadius: 0,
-          fill: true,
-          tension: 0.2
+          label: 'NFI (Network)',
+          data: nfiBins,
+          borderColor: '#500778', backgroundColor: 'rgba(80,7,120,.06)',
+          borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3,
+          spanGaps: true
+        },{
+          label: 'TAF (Motion)',
+          data: TAF_TIMELINE_DATA,
+          borderColor: '#00BDF2', backgroundColor: 'rgba(0,189,242,.08)',
+          borderWidth: 2, pointRadius: 0, fill: true, tension: 0.3,
+          spanGaps: false
         }]
       },
-      options: { responsive: true, maintainAspectRatio: false,
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: context => context.parsed.y.toFixed(3) + ' mm' } }
+          legend: { position: 'bottom', labels: { font: { size: 12 }, usePointStyle: true, padding: 16 } }
         },
         scales: {
-          x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 12, font: { size: 11 } }, grid: { color: cGrid } },
-          y: { title: { display: true, text: '3D position error (mm)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, beginAtZero: true }
+          x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 14, font: { size: 11 }, callback(v) { return v + 's'; } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'Fidelity (0–1)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0, max: 1 }
         }
       }
     });
