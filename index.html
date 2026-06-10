@@ -226,6 +226,60 @@
       .teleoperation-steps { grid-template-columns: 1fr; }
     }
 
+    /* ── Evidence story pipeline ── */
+    .evidence-pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 22px;
+      margin: 24px 0 48px;
+    }
+    .evidence-step {
+      position: relative;
+      min-height: 190px;
+      padding: 22px 18px;
+      background: var(--grey-bg);
+      border-top: 4px solid var(--ucl-dark);
+    }
+    .evidence-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -20px;
+      z-index: 1;
+      color: var(--ucl-bright);
+      font-size: 1.5rem;
+      font-weight: 700;
+      transform: translateY(-50%);
+    }
+    .evidence-step-number {
+      color: var(--ucl-bright);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .evidence-step h3 {
+      margin: 8px 0 10px;
+      font-size: 1.125rem;
+    }
+    .evidence-step p {
+      margin: 0;
+      color: var(--grey);
+      font-size: 0.875rem;
+      line-height: 1.55;
+    }
+    @media (max-width: 900px) {
+      .evidence-pipeline { grid-template-columns: 1fr; gap: 14px; }
+      .evidence-step { min-height: 0; }
+      .evidence-step:not(:last-child)::after {
+        content: "↓";
+        top: auto;
+        right: 50%;
+        bottom: -19px;
+        transform: translateX(50%);
+      }
+    }
+
     /* ── Score ring ── */
     .score-chart-wrap {
       position: relative;
@@ -660,6 +714,37 @@
             <p>RTT measures the complete round trip. NFI summarises network quality, while TAF summarises how accurately the robot followed its target.</p>
           </div>
         </div>
+      </div>
+
+      <div class="section-label">Evidence Story</div>
+      <h2>From Claim to Action</h2>
+      <p class="section-desc">A five-step evidence pipeline connecting network conditions to trustworthy robot behaviour.</p>
+      <div class="evidence-pipeline" aria-label="Evidence pipeline: Claim, Evidence, Method, Risk, Action">
+        <article class="evidence-step">
+          <div class="evidence-step-number">Step 1</div>
+          <h3>Claim</h3>
+          <p>Trustworthy teleoperation evidence should link network delay with robot motion output.</p>
+        </article>
+        <article class="evidence-step">
+          <div class="evidence-step-number">Step 2</div>
+          <h3>Evidence</h3>
+          <p>We use RTT and latency data together with UR5e robot arm motion data.</p>
+        </article>
+        <article class="evidence-step">
+          <div class="evidence-step-number">Step 3</div>
+          <h3>Method</h3>
+          <p>We align both datasets by time and analyse delay, speed, smoothness, and jerk.</p>
+        </article>
+        <article class="evidence-step">
+          <div class="evidence-step-number">Step 4</div>
+          <h3>Risk</h3>
+          <p>High latency may coincide with less smooth or less stable robot behaviour.</p>
+        </article>
+        <article class="evidence-step">
+          <div class="evidence-step-number">Step 5</div>
+          <h3>Action</h3>
+          <p>Future datasets should include command logs, reference paths, and latency-aware motion metrics.</p>
+        </article>
       </div>
 
       <div class="section-label" style="margin-top:28px;">Metric 1 · Network</div>
