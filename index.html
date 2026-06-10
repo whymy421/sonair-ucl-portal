@@ -433,7 +433,7 @@
         </div>
         <div class="stats-strip-item">
           <div class="stats-strip-value" id="stat-s2r-score">—</div>
-          <div class="stats-strip-label">TFI Score</div>
+          <div class="stats-strip-label">Network Score</div>
         </div>
       </div>
 
@@ -517,16 +517,18 @@
       </div>
     </section>
 
-    <!-- ── Challenge 1: TFI Metric ── -->
+    <!-- ── Challenge 1: Network and Motion Metrics ── -->
     <section class="section" id="metric">
       <div class="section-label">Challenge 1</div>
-      <h2>Sim2Real Gap Metric — Temporal Fidelity Index</h2>
-      <p class="section-desc">A novel metric to quantify the simulation-to-real timing gap for networked teleoperation.</p>
+      <h2>Sim2Real Evidence Metrics</h2>
+      <p class="section-desc">Matched 0–1 fidelity metrics for network timing and robot motion quality.</p>
 
-      <p>We propose the <strong>Temporal Fidelity Index (TFI)</strong> — a composite metric that captures how faithfully a real networked teleoperation system reproduces the timing assumptions of its simulation counterpart. Existing sim2real metrics focus on positional or visual accuracy; TFI targets the <em>temporal</em> dimension.</p>
+      <div class="section-label" style="margin-top:28px;">Metric 1 · Network</div>
+      <h2>Network Fidelity Index (NFI)</h2>
+      <p>The <strong>Network Fidelity Index</strong> captures how faithfully the real teleoperation link reproduces the timing assumptions of simulation. Higher values indicate lower delay, lower jitter, and fewer lost packets.</p>
 
       <h3 style="margin-top:28px;">Definition</h3>
-      <div class="formula">TFI = (1 − D<sub>norm</sub>) × (1 − J<sub>norm</sub>) × (1 − L<sub>rate</sub>)</div>
+      <div class="formula">NFI = (1 − D<sub>norm</sub>) × (1 − J<sub>norm</sub>) × (1 − L<sub>rate</sub>)</div>
       <ul class="def-list">
         <li><strong>D<sub>norm</sub></strong> — normalised mean excess delay = mean(RTT) / max(RTT).</li>
         <li><strong>J<sub>norm</sub></strong> — normalised jitter = std(RTT) / max(RTT).</li>
@@ -548,20 +550,63 @@
           <div class="stats-strip-label">L<sub>rate</sub></div>
         </div>
         <div class="stats-strip-item">
-          <div class="stats-strip-value" id="metric-tfi">—</div>
-          <div class="stats-strip-label">TFI</div>
+          <div class="stats-strip-value" id="metric-nfi">—</div>
+          <div class="stats-strip-label">NFI</div>
         </div>
       </div>
 
-      <h3>TFI Over Time</h3>
-      <p style="color:var(--grey);font-size:14px;">Rolling-window TFI (window = 50 samples). Dips correspond to latency spikes and link degradation.</p>
-      <div class="chart-area" style="height:240px;"><canvas id="tfi-chart"></canvas></div>
+      <h3>NFI Over Time</h3>
+      <p style="color:var(--grey);font-size:14px;">Rolling-window NFI (window = 50 samples). Dips correspond to latency spikes and link degradation.</p>
+      <div class="chart-area" style="height:240px;"><canvas id="nfi-chart"></canvas></div>
 
       <h3 style="margin-top:28px;">Why It Matters</h3>
       <p>For teleoperation, timing fidelity is often more critical than positional accuracy — delayed commands accumulate into trajectory divergence. A trajectory planned at 50 Hz assumes each command arrives within 20 ms, but the real network introduces variable delays that compound over time.</p>
 
-      <h3 style="margin-top:20px;">Adoption Across SONAIR</h3>
-      <p>TFI can be computed for any teleoperation session that logs RTT and packet loss. Each campus node could publish its TFI alongside raw data, enabling cross-institutional comparison and establishing minimum fidelity thresholds for safety-critical applications.</p>
+      <div class="section-label" style="margin-top:52px;">Metric 2 · Motion</div>
+      <h2>Motion Spectral Fidelity (MSF)</h2>
+      <p>The <strong>Motion Spectral Fidelity</strong> uses a Fourier transform of TCP position (<code>x, y, z</code>) and rotation (<code>rx, ry, rz</code>). It measures the proportion of signal energy above 0.75 Hz after uniform resampling and detrending. Lower high-frequency energy means smoother, more repeatable motion.</p>
+
+      <h3 style="margin-top:28px;">Definition</h3>
+      <div class="formula">MSF = (1 − P<sub>hf</sub>) × (1 − R<sub>hf</sub>)</div>
+      <ul class="def-list">
+        <li><strong>P<sub>hf</sub></strong> — mean high-frequency energy ratio across <code>x, y, z</code>.</li>
+        <li><strong>R<sub>hf</sub></strong> — mean high-frequency energy ratio across <code>rx, ry, rz</code>.</li>
+        <li><strong>High frequency</strong> — spectral energy at or above 0.75 Hz after resampling to 4 Hz.</li>
+      </ul>
+
+      <h3>Calculated Result</h3>
+      <div class="stats-strip" style="grid-template-columns: repeat(4,1fr);">
+        <div class="stats-strip-item">
+          <div class="stats-strip-value" id="metric-phf">—</div>
+          <div class="stats-strip-label">P<sub>hf</sub></div>
+        </div>
+        <div class="stats-strip-item">
+          <div class="stats-strip-value" id="metric-rhf">—</div>
+          <div class="stats-strip-label">R<sub>hf</sub></div>
+        </div>
+        <div class="stats-strip-item">
+          <div class="stats-strip-value">0.75 Hz</div>
+          <div class="stats-strip-label">Cut-off</div>
+        </div>
+        <div class="stats-strip-item">
+          <div class="stats-strip-value" id="metric-msf">—</div>
+          <div class="stats-strip-label">MSF</div>
+        </div>
+      </div>
+
+      <h3>Frequency Evidence</h3>
+      <p style="color:var(--grey);font-size:14px;">Normalised FFT power for position and rotation. The dashed line marks the 0.75 Hz high-frequency threshold.</p>
+      <div class="chart-area" style="height:260px;"><canvas id="motion-spectrum-chart"></canvas></div>
+
+      <h3>MSF Over Time</h3>
+      <p style="color:var(--grey);font-size:14px;">Rolling 32-second windows. Dips indicate periods with a larger high-frequency motion component.</p>
+      <div class="chart-area" style="height:240px;"><canvas id="msf-chart"></canvas></div>
+
+      <h3 style="margin-top:28px;">Interpretation</h3>
+      <div class="highlight-block">
+        <p><strong>Spectral evidence.</strong> High-frequency energy can indicate vibration, control chatter, quantisation, or sensor noise. It may also contain genuine fast manoeuvres, so MSF should be interpreted alongside the trajectory and command log rather than used as a standalone safety verdict.</p>
+        <p><strong>Adoption across SONAIR.</strong> NFI and MSF share the same 0–1 fidelity format. Together they separate network timing quality from motion smoothness, enabling campuses to compare where sim2real degradation enters the teleoperation chain.</p>
+      </div>
     </section>
 
     <!-- ── Requests Inbox ── -->
@@ -613,6 +658,7 @@
   <!-- Data -->
   <script src="data.js"></script>
   <script src="motion_data.js"></script>
+  <script src="motion_noise.js"></script>
   <script src="motion_player.js"></script>
   <script>
     const rtts = RTT_DATA.map(d => d.rtt);
@@ -634,13 +680,18 @@
     const D_norm = meanRTT / maxRTT;
     const J_norm = stdRTT / maxRTT;
     const L_rate = lossRate;
-    const TFI = (1 - D_norm) * (1 - J_norm) * (1 - L_rate);
+    const NFI = (1 - D_norm) * (1 - J_norm) * (1 - L_rate);
 
-    document.getElementById('stat-s2r-score').textContent = TFI.toFixed(3);
+    document.getElementById('stat-s2r-score').textContent = NFI.toFixed(3);
     document.getElementById('metric-dnorm').textContent = D_norm.toFixed(3);
     document.getElementById('metric-jnorm').textContent = J_norm.toFixed(3);
     document.getElementById('metric-lrate').textContent = L_rate.toFixed(3);
-    document.getElementById('metric-tfi').textContent = TFI.toFixed(3);
+    document.getElementById('metric-nfi').textContent = NFI.toFixed(3);
+
+    const motionNoise = MOTION_NOISE.summary;
+    document.getElementById('metric-phf').textContent = motionNoise.position_high_frequency_ratio.toFixed(3);
+    document.getElementById('metric-rhf').textContent = motionNoise.rotation_high_frequency_ratio.toFixed(3);
+    document.getElementById('metric-msf').textContent = motionNoise.motion_spectral_fidelity.toFixed(3);
 
     const cFont = { family: "-apple-system, sans-serif" };
     const cGrid = '#E5E5E5';
@@ -680,25 +731,81 @@
       }
     });
 
-    // TFI rolling
-    const ws = 50, tfiT = [];
+    // NFI rolling
+    const ws = 50, nfiT = [];
     for (let i = ws; i < RTT_DATA.length; i++) {
       const w = RTT_DATA.slice(i-ws,i).map(d=>d.rtt);
       const m = w.reduce((a,b)=>a+b,0)/w.length;
       const s = Math.sqrt(w.reduce((x,v)=>x+(v-m)**2,0)/w.length);
       const l = RTT_DATA.slice(i-ws,i).filter(d=>d.lost>0).length/ws;
-      tfiT.push({ ts: RTT_DATA[i].ts, v: (1-m/maxRTT)*(1-s/maxRTT)*(1-l) });
+      nfiT.push({ ts: RTT_DATA[i].ts, v: (1-m/maxRTT)*(1-s/maxRTT)*(1-l) });
     }
-    new Chart(document.getElementById('tfi-chart'), {
+    new Chart(document.getElementById('nfi-chart'), {
       type: 'line',
-      data: { labels: tfiT.map(d=>d.ts.toFixed(0)), datasets: [{
-        data: tfiT.map(d=>d.v), borderColor: cPurple, backgroundColor: 'rgba(80,7,120,.04)',
+      data: { labels: nfiT.map(d=>d.ts.toFixed(0)), datasets: [{
+        data: nfiT.map(d=>d.v), borderColor: cPurple, backgroundColor: 'rgba(80,7,120,.04)',
         borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3
       }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
         scales: {
-          x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 12, font: { size: 11 }, callback(v,i) { return tfiT[i]?tfiT[i].ts.toFixed(0)+'s':''; } }, grid: { color: cGrid } },
-          y: { title: { display: true, text: 'TFI', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0, max: 1 }
+          x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 12, font: { size: 11 }, callback(v,i) { return nfiT[i]?nfiT[i].ts.toFixed(0)+'s':''; } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'NFI', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0, max: 1 }
+        }
+      }
+    });
+
+    const spectrum = MOTION_NOISE.spectrum;
+    const cutoffLine = {
+      id: 'cutoffLine',
+      afterDraw(chart) {
+        const cutoffIndex = spectrum.findIndex(d=>d.frequency>=0.75);
+        if (cutoffIndex < 0) return;
+        const x = chart.scales.x.getPixelForValue(cutoffIndex);
+        const area = chart.chartArea;
+        const context = chart.ctx;
+        context.save();
+        context.strokeStyle = '#D64545';
+        context.setLineDash([5,5]);
+        context.lineWidth = 1;
+        context.beginPath();
+        context.moveTo(x, area.top);
+        context.lineTo(x, area.bottom);
+        context.stroke();
+        context.fillStyle = '#D64545';
+        context.font = '11px -apple-system, sans-serif';
+        context.fillText('0.75 Hz', x + 5, area.top + 13);
+        context.restore();
+      }
+    };
+    new Chart(document.getElementById('motion-spectrum-chart'), {
+      type: 'line',
+      data: {
+        labels: spectrum.map(d=>d.frequency),
+        datasets: [
+          { label: 'Position (XYZ)', data: spectrum.map(d=>d.position_power), borderColor: cPurple, borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
+          { label: 'Rotation (Rx/Ry/Rz)', data: spectrum.map(d=>d.rotation_power), borderColor: '#00BDF2', borderWidth: 1.5, pointRadius: 0, tension: 0.2 }
+        ]
+      },
+      plugins: [cutoffLine],
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: cTick, font: { size: 11 } } } },
+        scales: {
+          x: { title: { display: true, text: 'Frequency (Hz)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 10, font: { size: 11 } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'Normalised power', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0, max: 1 }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('msf-chart'), {
+      type: 'line',
+      data: { labels: MOTION_NOISE.timeline.map(d=>d.t), datasets: [{
+        data: MOTION_NOISE.timeline.map(d=>d.value), borderColor: '#00BDF2', backgroundColor: 'rgba(0,189,242,.06)',
+        borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.3
+      }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+        scales: {
+          x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 12, font: { size: 11 } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: 'MSF', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0, max: 1 }
         }
       }
     });
