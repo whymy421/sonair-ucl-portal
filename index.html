@@ -188,6 +188,24 @@
     @media (max-width: 700px) { .chart-grid { grid-template-columns: 1fr; } }
     .chart-grid .chart-card { margin-bottom: 0; }
 
+    /* ── Inline chart interpretation toggle ── */
+    .chart-card-interp-toggle {
+      display: flex; align-items: center; gap: 8px; cursor: pointer;
+      margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--grey-rule);
+      user-select: none;
+    }
+    .chart-card-interp-toggle span { font-size: 13px; font-weight: 600; color: var(--ucl-dark); }
+    .chart-card-interp-arrow {
+      width: 28px; height: 28px; background: var(--ucl-dark); display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0; transition: transform .2s;
+    }
+    .chart-card-interp-arrow svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 2.5; }
+    .chart-card.interp-open .chart-card-interp-arrow { transform: rotate(90deg); }
+    .chart-card-interp-body { display: none; margin-top: 12px; font-size: 14px; line-height: 1.6; color: var(--grey); }
+    .chart-card.interp-open .chart-card-interp-body { display: block; }
+    .chart-card-interp-body p { margin-bottom: 8px; }
+    .chart-card-interp-body strong { color: var(--black); }
+
     /* ── Plain-language teleoperation overview ── */
     .teleoperation-overview {
       margin: 28px 0 44px;
@@ -595,31 +613,31 @@
       </div>
 
       <div class="chart-grid">
-        <div class="chart-card">
+        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
           <h3>Round-Trip Time</h3>
           <p style="color:var(--grey);font-size:14px;">Network RTT between UCL and Nottingham over 437 seconds.</p>
           <div class="chart-area"><canvas id="rtt-chart"></canvas></div>
+          <div class="chart-card-interp-toggle">
+            <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+            <span>Interpretation</span>
+          </div>
+          <div class="chart-card-interp-body">
+            <p><strong>Network stability.</strong> Mean RTT of ~55 ms with a range of 14–401 ms indicates generally responsive conditions, but with significant outlier spikes. The P95 value shows 5% of measurements exceed a much higher threshold, suggesting intermittent congestion on the UCL–Nottingham link.</p>
+            <p><strong>Sim2real implication.</strong> In simulation, commands execute instantaneously. In reality, variable latency introduces a timing gap. A trajectory planned at 50 Hz assumes each command arrives within 20 ms, but the network delivers with ~25 ms standard deviation. The physical robot diverges from the simulated trajectory, particularly during fast motions.</p>
+            <p><strong>Session events.</strong> The audit log shows a burst of <code>link_degraded</code> rejections near t=420 s, correlating with RTT spikes. Network instability directly impacts teleoperation reliability.</p>
+          </div>
         </div>
-        <div class="chart-card">
+        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
           <h3>Command Latency Distribution</h3>
           <p style="color:var(--grey);font-size:14px;">Relay round-trip times for 4,220 commands.</p>
           <div class="chart-area"><canvas id="latency-chart"></canvas></div>
-        </div>
-      </div>
-
-      <div class="interp-card" onclick="this.classList.toggle('open')">
-        <div class="interp-card-header">
-          <div>
-            <h3>Interpretation</h3>
-            <p class="interp-card-summary">Network performance analysis and sim2real implications for this teleoperation session.</p>
+          <div class="chart-card-interp-toggle">
+            <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+            <span>Interpretation</span>
           </div>
-          <div class="interp-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
-        </div>
-        <div class="interp-card-detail">
-          <p><strong>Network stability.</strong> Mean RTT of ~55 ms with a range of 14–401 ms indicates generally responsive conditions, but with significant outlier spikes. The P95 value shows 5% of measurements exceed a much higher threshold, suggesting intermittent congestion on the UCL–Nottingham link.</p>
-          <p><strong>Command latency.</strong> The histogram clusters tightly around 20–40 ms — acceptable for non-safety-critical teleoperation. A long tail beyond 100 ms means some commands experience delays that could cause visible desynchronisation between operator input and robot response.</p>
-          <p><strong>Sim2real implication.</strong> In simulation, commands execute instantaneously. In reality, variable latency introduces a timing gap. A trajectory planned at 50 Hz assumes each command arrives within 20 ms, but the network delivers with ~25 ms standard deviation. The physical robot diverges from the simulated trajectory, particularly during fast motions.</p>
-          <p><strong>Session events.</strong> The audit log shows a burst of <code>link_degraded</code> rejections near t=420 s, correlating with RTT spikes. Network instability directly impacts teleoperation reliability.</p>
+          <div class="chart-card-interp-body">
+            <p><strong>Command latency.</strong> The histogram clusters tightly around 20–40 ms — acceptable for non-safety-critical teleoperation. A long tail beyond 100 ms means some commands experience delays that could cause visible desynchronisation between operator input and robot response.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -631,25 +649,54 @@
       <p class="section-desc">End-effector (TCP) position and joint angles recorded at 5 Hz · 712 TCP samples · 717 joint samples · 2,128 operations</p>
 
       <div class="chart-grid">
-        <div class="chart-card">
+        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
           <h3>Operation Breakdown</h3>
           <p style="color:var(--grey);font-size:14px;">Commands sent to the UR5e during the session.</p>
           <div class="chart-area" style="height:220px;"><canvas id="ops-chart"></canvas></div>
+          <div class="chart-card-interp-toggle">
+            <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+            <span>Interpretation</span>
+          </div>
+          <div class="chart-card-interp-body">
+            <p><strong>Command mix.</strong> The session is dominated by <code>speedl</code> (linear velocity) commands, with brief <code>speedl_stop</code> pauses. This pattern reflects smooth, continuous teleoperation rather than discrete pick-and-place motions.</p>
+          </div>
         </div>
-        <div class="chart-card">
+        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
           <h3>TCP End-Effector Speed</h3>
           <p style="color:var(--grey);font-size:14px;">Cartesian speed of the tool tip, derived from consecutive TCP samples.</p>
           <div class="chart-area" style="height:220px;"><canvas id="speed-chart"></canvas></div>
+          <div class="chart-card-interp-toggle">
+            <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+            <span>Interpretation</span>
+          </div>
+          <div class="chart-card-interp-body">
+            <p><strong>Speed profile.</strong> Speed varies significantly — periods of near-zero speed alternate with faster movements. Speed spikes reveal rapid repositioning commands, the most latency-sensitive phases for sim2real fidelity.</p>
+          </div>
         </div>
-        <div class="chart-card">
+        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
           <h3>TCP Trajectory (XY Plane)</h3>
           <p style="color:var(--grey);font-size:14px;">Top-down view of the end-effector path.</p>
           <div class="chart-area" style="height:300px;"><canvas id="trajectory-chart"></canvas></div>
+          <div class="chart-card-interp-toggle">
+            <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+            <span>Interpretation</span>
+          </div>
+          <div class="chart-card-interp-body">
+            <p><strong>Trajectory pattern.</strong> The TCP trajectory shows the robot operated within a compact workspace, with the end-effector moving primarily in the XY plane. Clusters indicate repeated positioning tasks or fine adjustments during teleoperation.</p>
+          </div>
         </div>
-        <div class="chart-card">
+        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
           <h3>Joint Angles</h3>
           <p style="color:var(--grey);font-size:14px;">All six joint angles (degrees) over the session.</p>
           <div class="chart-area" style="height:300px;"><canvas id="joint-chart"></canvas></div>
+          <div class="chart-card-interp-toggle">
+            <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+            <span>Interpretation</span>
+          </div>
+          <div class="chart-card-interp-body">
+            <p><strong>Joint coordination.</strong> Joint angles show coordinated multi-joint motion, confirming active manipulation. The joint data captures the robot's configuration space, complementing the Cartesian TCP view.</p>
+            <p><strong>Sim2real relevance.</strong> Combined with RTT data, motion data reveals which movements coincide with latency spikes. High-speed motions during high-latency periods represent the worst-case sim2real gap.</p>
+          </div>
         </div>
       </div>
 
@@ -675,21 +722,6 @@
         </div>
       </div>
 
-      <div class="interp-card" onclick="this.classList.toggle('open')">
-        <div class="interp-card-header">
-          <div>
-            <h3>Motion Interpretation</h3>
-            <p class="interp-card-summary">Trajectory, speed profile, and joint coordination analysis for UR5e teleoperation.</p>
-          </div>
-          <div class="interp-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
-        </div>
-        <div class="interp-card-detail">
-          <p><strong>Trajectory pattern.</strong> The TCP trajectory shows the robot operated within a compact workspace, with the end-effector moving primarily in the XY plane. Clusters indicate repeated positioning tasks or fine adjustments during teleoperation.</p>
-          <p><strong>Speed profile.</strong> Speed varies significantly — periods of near-zero speed alternate with faster movements. Speed spikes reveal rapid repositioning commands, the most latency-sensitive phases for sim2real fidelity.</p>
-          <p><strong>Joint coordination.</strong> Joint angles show coordinated multi-joint motion, confirming active manipulation. The joint data captures the robot's configuration space, complementing the Cartesian TCP view.</p>
-          <p><strong>Sim2real relevance.</strong> Combined with RTT data, motion data reveals which movements coincide with latency spikes. High-speed motions during high-latency periods represent the worst-case sim2real gap.</p>
-        </div>
-      </div>
     </section>
 
     <!-- ── Challenge 1: Network and Motion Metrics ── -->
@@ -751,7 +783,7 @@
 
       <!-- Combined Metrics -->
       <div class="chart-grid">
-        <div class="chart-card">
+        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
           <div class="stats-strip" style="grid-template-columns: 1fr; margin: 0 0 16px;">
             <div class="stats-strip-item" style="border:none;">
               <div class="stats-strip-value" id="metric-nfi" style="font-size:2rem;">—</div>
@@ -764,8 +796,16 @@
             <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-jnorm">—</div><div class="stats-strip-label">J<sub>norm</sub></div></div>
             <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-lrate">—</div><div class="stats-strip-label">L<sub>rate</sub></div></div>
           </div>
+          <div class="chart-card-interp-toggle">
+            <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+            <span>Interpretation</span>
+          </div>
+          <div class="chart-card-interp-body">
+            <p><strong>Network timing.</strong> For teleoperation, timing fidelity is often more critical than positional accuracy — delayed commands accumulate into trajectory divergence.</p>
+            <p><strong>Adoption across SONAIR.</strong> NFI uses a 0–1 format, making network timing quality directly comparable across federation nodes.</p>
+          </div>
         </div>
-        <div class="chart-card">
+        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
           <div class="stats-strip" style="grid-template-columns: 1fr; margin: 0 0 16px;">
             <div class="stats-strip-item" style="border:none;">
               <div class="stats-strip-value" id="metric-taf" style="font-size:2rem;">—</div>
@@ -778,28 +818,27 @@
             <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-orientation-rmse">—</div><div class="stats-strip-label">Ori RMSE</div></div>
             <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-tracking-lag">—</div><div class="stats-strip-label">Median Lag</div></div>
           </div>
+          <div class="chart-card-interp-toggle">
+            <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+            <span>Interpretation</span>
+          </div>
+          <div class="chart-card-interp-body">
+            <p><strong>Tracking evidence.</strong> Across 212,433 samples, TCP position RMSE is 0.137 mm, orientation RMSE is 0.0206°, and the typical target-to-actual lag is 10 ms.</p>
+            <p><strong>Important limitation.</strong> Normal and faulty assembly outcomes have similar tracking scores. TAF measures robot control fidelity; it should be combined with task-force, vision, or assembly-state evidence for fault detection.</p>
+          </div>
         </div>
       </div>
 
-      <div class="chart-card" style="margin-top:24px;">
+      <div class="chart-card" style="margin-top:24px;" onclick="this.classList.toggle('interp-open')">
         <h3>NFI vs TAF Over Time</h3>
         <p style="color:var(--grey);font-size:14px;">Network fidelity (purple) and tracking fidelity (blue) on the same 437 s timeline. Both use a 0–1 scale; higher = better.</p>
         <div class="chart-area" style="height:300px;"><canvas id="combined-metric-chart"></canvas></div>
-      </div>
-
-      <div class="interp-card" onclick="this.classList.toggle('open')" style="margin-top:24px;">
-        <div class="interp-card-header">
-          <div>
-            <h3>Interpretation</h3>
-            <p class="interp-card-summary">How NFI and TAF work together to quantify the sim2real gap across SONAIR.</p>
-          </div>
-          <div class="interp-card-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+        <div class="chart-card-interp-toggle">
+          <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+          <span>Interpretation</span>
         </div>
-        <div class="interp-card-detail">
-          <p><strong>Network timing.</strong> For teleoperation, timing fidelity is often more critical than positional accuracy — delayed commands accumulate into trajectory divergence.</p>
-          <p><strong>Tracking evidence.</strong> Across 212,433 samples, TCP position RMSE is 0.137 mm, orientation RMSE is 0.0206°, and the typical target-to-actual lag is 10 ms.</p>
-          <p><strong>Important limitation.</strong> Normal and faulty assembly outcomes have similar tracking scores. TAF measures robot control fidelity; it should be combined with task-force, vision, or assembly-state evidence for fault detection.</p>
-          <p><strong>Adoption across SONAIR.</strong> NFI and TAF share the same 0–1 format, separating network timing quality from robot target-following quality.</p>
+        <div class="chart-card-interp-body">
+          <p><strong>Combined view.</strong> NFI and TAF share the same 0–1 scale, separating network timing quality from robot target-following quality. Periods where both drop simultaneously represent the strongest sim2real gap evidence.</p>
         </div>
       </div>
     </section>
