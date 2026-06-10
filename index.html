@@ -166,6 +166,50 @@
     /* ── Chart ── */
     .chart-area { position: relative; height: 300px; margin: 16px 0 8px; }
 
+    /* ── Chart card ── */
+    .chart-card {
+      background: var(--grey-bg);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .chart-card h3 { margin-bottom: 4px; }
+    .chart-card .chart-area { margin-top: 12px; }
+
+    /* ── Chart grid ── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+    @media (max-width: 700px) { .chart-grid { grid-template-columns: 1fr; } }
+    .chart-grid .chart-card { margin-bottom: 0; }
+
+    /* ── UCL notice ── */
+    .ucl-notice {
+      background: #F0E8F5;
+      border-left: 4px solid var(--ucl-dark);
+      padding: 20px 24px;
+      margin: 16px 0;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .ucl-notice-icon {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--ucl-dark);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--ucl-dark);
+    }
+    .ucl-notice p { margin: 0; color: var(--black); font-size: 15px; }
+
     /* ── Highlight block (interpretation) ── */
     .highlight-block {
       background: var(--grey-bg);
@@ -331,13 +375,18 @@
         </div>
       </div>
 
-      <h3>Round-Trip Time</h3>
-      <p style="color:var(--grey);font-size:14px;">Network RTT between UCL (sender) and Nottingham (receiver) over 437 seconds.</p>
-      <div class="chart-area"><canvas id="rtt-chart"></canvas></div>
-
-      <h3 style="margin-top:36px;">Command Latency Distribution</h3>
-      <p style="color:var(--grey);font-size:14px;">Relay round-trip times for 4,220 commands. Purple = normal, amber = elevated, red = high.</p>
-      <div class="chart-area" style="height:260px;"><canvas id="latency-chart"></canvas></div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Round-Trip Time</h3>
+          <p style="color:var(--grey);font-size:14px;">Network RTT between UCL and Nottingham over 437 seconds.</p>
+          <div class="chart-area"><canvas id="rtt-chart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Command Latency Distribution</h3>
+          <p style="color:var(--grey);font-size:14px;">Relay round-trip times for 4,220 commands.</p>
+          <div class="chart-area"><canvas id="latency-chart"></canvas></div>
+        </div>
+      </div>
 
       <h3 style="margin-top:36px;">Interpretation</h3>
       <div class="highlight-block">
@@ -354,26 +403,28 @@
       <h2>UR5e Teleoperation Motion</h2>
       <p class="section-desc">End-effector (TCP) position and joint angles recorded at 5 Hz · 712 TCP samples · 717 joint samples · 2,128 operations</p>
 
-      <div class="two-col">
-        <div>
+      <div class="chart-grid">
+        <div class="chart-card">
           <h3>Operation Breakdown</h3>
           <p style="color:var(--grey);font-size:14px;">Commands sent to the UR5e during the session.</p>
           <div class="chart-area" style="height:220px;"><canvas id="ops-chart"></canvas></div>
         </div>
-        <div>
+        <div class="chart-card">
           <h3>TCP End-Effector Speed</h3>
           <p style="color:var(--grey);font-size:14px;">Cartesian speed of the tool tip, derived from consecutive TCP samples.</p>
           <div class="chart-area" style="height:220px;"><canvas id="speed-chart"></canvas></div>
         </div>
+        <div class="chart-card">
+          <h3>TCP Trajectory (XY Plane)</h3>
+          <p style="color:var(--grey);font-size:14px;">Top-down view of the end-effector path.</p>
+          <div class="chart-area" style="height:300px;"><canvas id="trajectory-chart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Joint Angles</h3>
+          <p style="color:var(--grey);font-size:14px;">All six joint angles (degrees) over the session.</p>
+          <div class="chart-area" style="height:300px;"><canvas id="joint-chart"></canvas></div>
+        </div>
       </div>
-
-      <h3 style="margin-top:36px;">TCP Trajectory (XY Plane)</h3>
-      <p style="color:var(--grey);font-size:14px;">Top-down view of the end-effector path. Colour shifts from dark to light along the timeline.</p>
-      <div class="chart-area" style="height:340px;"><canvas id="trajectory-chart"></canvas></div>
-
-      <h3 style="margin-top:36px;">Joint Angles</h3>
-      <p style="color:var(--grey);font-size:14px;">All six joint angles (degrees) over the session.</p>
-      <div class="chart-area" style="height:300px;"><canvas id="joint-chart"></canvas></div>
 
       <h3 style="margin-top:36px;">Motion Interpretation</h3>
       <div class="highlight-block">
@@ -383,19 +434,21 @@
         <p><strong>Sim2real relevance.</strong> Combined with RTT data, motion data reveals which movements coincide with latency spikes. High-speed motions during high-latency periods represent the worst-case sim2real gap.</p>
       </div>
 
-      <h3 style="margin-top:36px;">Latency–Motion Evidence</h3>
-      <p style="color:var(--grey);font-size:14px;">TCP samples aligned to the nearest RTT observation. Absolute jerk captures abrupt changes in end-effector acceleration.</p>
-      <div class="chart-area" style="height:300px;"><canvas id="latency-jerk-chart"></canvas></div>
+      <div class="chart-card" style="margin-top:24px;">
+        <h3>Latency–Motion Evidence</h3>
+        <p style="color:var(--grey);font-size:14px;">TCP samples aligned to the nearest RTT observation. Absolute jerk captures abrupt changes in end-effector acceleration.</p>
+        <div class="chart-area" style="height:300px;"><canvas id="latency-jerk-chart"></canvas></div>
+      </div>
 
-      <div class="two-col" style="margin-top:28px;">
-        <div>
+      <div class="chart-grid">
+        <div class="chart-card">
           <h3>Jerk by Network Condition</h3>
-          <p style="color:var(--grey);font-size:14px;">Normal RTT (&lt;60 ms) compared with high RTT (&gt;100 ms).</p>
+          <p style="color:var(--grey);font-size:14px;">Normal RTT (&lt;60 ms) vs high RTT (&gt;100 ms).</p>
           <div class="chart-area" style="height:240px;"><canvas id="jerk-comparison-chart"></canvas></div>
         </div>
-        <div>
+        <div class="chart-card">
           <h3>Motion Degradation Score</h3>
-          <p style="color:var(--grey);font-size:14px;">Rolling 0–100 score combining normalised RTT and end-effector jerk.</p>
+          <p style="color:var(--grey);font-size:14px;">Rolling 0–100 score combining normalised RTT and jerk.</p>
           <div class="chart-area" style="height:240px;"><canvas id="motion-degradation-chart"></canvas></div>
         </div>
       </div>
@@ -456,7 +509,10 @@
       <div class="section-label">Collaboration</div>
       <h2>Requests Inbox</h2>
       <p class="section-desc">Access or collaboration requests routed to the UCL campus node.</p>
-      <div id="requests-inbox"></div>
+      <div class="ucl-notice">
+        <div class="ucl-notice-icon">i</div>
+        <p>No collaboration or data-access requests have been received yet. When another SONAIR node sends a request, it will appear here.</p>
+      </div>
     </section>
 
   </div>
@@ -493,8 +549,6 @@
     window.SONAIR_NODE_ID  = 'ucl';
     window.SONAIR_API_BASE = 'http://EVENT_REQUEST_API:5055';
   </script>
-  <script src="sonair_request_system.js"></script>
-  <script>SONAIR_REQUESTS.renderInbox('requests-inbox');</script>
 
   <!-- Data -->
   <script src="data.js"></script>
