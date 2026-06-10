@@ -1,0 +1,20 @@
+{
+  "node": {
+    "id": "ucl",
+    "name": "University College London",
+    "city": "London",
+    "lat": 51.5246,
+    "lon": -0.1340,
+    "color": "#500778",
+    "url": "https://whymy421.github.io/sonair-ucl-portal/",
+    "contact_email": "songyutong@ucl.ac.uk",
+    "role": "Hackathon campus node",
+    "summary": "UCL Robotics Lab — UR5e teleoperation research, sim2real gap quantification, and remote control latency analysis. Open to collaboration on federated robotics benchmarking and cross-institutional dataset sharing."
+  },
+  "co_creation_card": {
+    "title": "UCL Robotics SONAIR Sub-Portal",
+    "description": "Evidence dashboard for UCL–Nottingham UR5e teleoperation experiment. Features sim2real gap metrics, RTT analysis, and command latency profiling for the SONAIR network.",
+    "tags": ["Robotics", "Sim2Real", "Teleoperation", "UR5e", "SONAIR"],
+    "visitor_url": "https://whymy421.github.io/sonair-ucl-portal/"
+  }
+}
