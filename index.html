@@ -188,6 +188,72 @@
     @media (max-width: 700px) { .chart-grid { grid-template-columns: 1fr; } }
     .chart-grid .chart-card { margin-bottom: 0; }
 
+    /* ── Plain-language teleoperation overview ── */
+    .teleoperation-overview {
+      margin: 28px 0 44px;
+      background: var(--grey-bg);
+      padding: 24px;
+    }
+    .teleoperation-overview img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #fff;
+    }
+    .teleoperation-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 20px;
+    }
+    .teleoperation-step {
+      background: #fff;
+      border-top: 4px solid var(--ucl-dark);
+      padding: 18px;
+    }
+    .teleoperation-step strong {
+      display: block;
+      color: var(--ucl-dark);
+      margin-bottom: 6px;
+    }
+    .teleoperation-step p {
+      margin: 0;
+      color: var(--grey);
+      font-size: 14px;
+    }
+    @media (max-width: 700px) {
+      .teleoperation-overview { padding: 16px; }
+      .teleoperation-steps { grid-template-columns: 1fr; }
+    }
+
+    /* ── Score ring ── */
+    .score-chart-wrap {
+      position: relative;
+      height: 320px;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+    .score-chart-centre {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .score-chart-value {
+      color: var(--ucl-dark);
+      font-size: 2.25rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .score-chart-total {
+      margin-top: 7px;
+      color: var(--grey);
+      font-size: 0.875rem;
+    }
+
     /* ── UCL notice ── */
     .ucl-notice {
       background: #F0E8F5;
@@ -439,8 +505,8 @@
             <span class="tag">Session Audit</span>
           </div>
           <h3>Contact</h3>
-          <p><a href="mailto:yutong.song.25@ucl.ac.uk">yutong.song.25@ucl.ac.uk</a></p>
-          <p>Zachary WU · <a href="mailto:ucemz16@ucl.ac.uk">ucemz16@ucl.ac.uk</a></p>
+          <p>Yutong Song · <a href="mailto:yutong.song.25@ucl.ac.uk">yutong.song.25@ucl.ac.uk</a></p>
+          <p>Zachary Wu · <a href="mailto:ucemz16@ucl.ac.uk">ucemz16@ucl.ac.uk</a></p>
         </div>
       </div>
     </section>
@@ -576,6 +642,26 @@
       <h2>Sim2Real Evidence Metrics</h2>
       <p class="section-desc">Matched 0–1 fidelity metrics for network timing and robot motion quality.</p>
 
+      <div class="teleoperation-overview">
+        <h3>How Remote Robot Control Works</h3>
+        <p>Before reading the metrics, this diagram shows the journey of one remote-control message between UCL, the robot arm, and the Nottingham data server.</p>
+        <img src="communication-path-teleoperation.png" alt="Communication path between the UCL operator, robot arm, and Nottingham data server">
+        <div class="teleoperation-steps">
+          <div class="teleoperation-step">
+            <strong>1. UCL sends a command</strong>
+            <p>An operator asks the robot to move. Network delay means the robot does not receive that instruction instantly.</p>
+          </div>
+          <div class="teleoperation-step">
+            <strong>2. The robot sends feedback</strong>
+            <p>The robot reports what it actually did. This lets us compare the requested movement with the measured movement.</p>
+          </div>
+          <div class="teleoperation-step">
+            <strong>3. Results return to UCL</strong>
+            <p>RTT measures the complete round trip. NFI summarises network quality, while TAF summarises how accurately the robot followed its target.</p>
+          </div>
+        </div>
+      </div>
+
       <div class="section-label" style="margin-top:28px;">Metric 1 · Network</div>
       <h2>Network Fidelity Index (NFI)</h2>
       <p>The <strong>Network Fidelity Index</strong> captures how faithfully the real teleoperation link reproduces the timing assumptions of simulation. Higher values indicate lower delay, lower jitter, and fewer lost packets.</p>
@@ -648,10 +734,23 @@
         </div>
       </div>
 
-      <div class="chart-card">
-        <h3>TCP Position Tracking Error Over Time</h3>
-        <p style="color:var(--grey);font-size:14px;">Three-dimensional distance between target and actual TCP position during representative normal operation 23. Lower is better.</p>
-        <div class="chart-area" style="height:320px;"><canvas id="tracking-error-chart"></canvas></div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>TCP Position Tracking Error Over Time</h3>
+          <p style="color:var(--grey);font-size:14px;">Three-dimensional distance between target and actual TCP position during representative normal operation 23. Lower is better.</p>
+          <div class="chart-area" style="height:320px;"><canvas id="tracking-error-chart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Overall TAF Score</h3>
+          <p style="color:var(--grey);font-size:14px;">A simple 0–1 summary: 1.000 is perfect target following; a higher score means more faithful robot motion.</p>
+          <div class="score-chart-wrap">
+            <canvas id="taf-score-chart"></canvas>
+            <div class="score-chart-centre">
+              <div class="score-chart-value" id="taf-score-centre">—</div>
+              <div class="score-chart-total">out of 1.000</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="interp-card" onclick="this.classList.toggle('open')">
@@ -691,8 +790,8 @@
         <p style="margin-top:4px;">Part of the SONAIR National Network</p>
       </div>
       <div>
-        <a href="mailto:yutong.song.25@ucl.ac.uk">yutong.song.25@ucl.ac.uk</a>
-        <p style="margin-top:4px;">Zachary WU · <a href="mailto:ucemz16@ucl.ac.uk">ucemz16@ucl.ac.uk</a></p>
+        <p>Yutong Song · <a href="mailto:yutong.song.25@ucl.ac.uk">yutong.song.25@ucl.ac.uk</a></p>
+        <p style="margin-top:4px;">Zachary Wu · <a href="mailto:ucemz16@ucl.ac.uk">ucemz16@ucl.ac.uk</a></p>
         <p style="margin-top:4px;">&copy; 2026 University College London</p>
       </div>
     </div>
@@ -755,6 +854,7 @@
     document.getElementById('metric-orientation-rmse').textContent = tracking.orientation_rmse_deg.toFixed(3) + '°';
     document.getElementById('metric-tracking-lag').textContent = tracking.median_lag_ms.toFixed(0) + ' ms';
     document.getElementById('metric-taf').textContent = tracking.tracking_fidelity.toFixed(3);
+    document.getElementById('taf-score-centre').textContent = tracking.tracking_fidelity.toFixed(3);
 
     const cFont = { family: "-apple-system, sans-serif" };
     const cGrid = '#E5E5E5';
@@ -893,6 +993,35 @@
         scales: {
           x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 12, font: { size: 11 } }, grid: { color: cGrid } },
           y: { title: { display: true, text: '3D position error (mm)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, beginAtZero: true }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('taf-score-chart'), {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [tracking.tracking_fidelity, 1 - tracking.tracking_fidelity],
+          backgroundColor: [cPurple, '#DDD6E2'],
+          borderWidth: 0,
+          hoverOffset: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '74%',
+        rotation: -90,
+        circumference: 360,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: context => context.dataIndex === 0
+                ? 'TAF: ' + tracking.tracking_fidelity.toFixed(3)
+                : 'Gap to 1.000: ' + (1 - tracking.tracking_fidelity).toFixed(3)
+            }
+          }
         }
       }
     });
