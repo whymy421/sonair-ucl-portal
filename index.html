@@ -613,11 +613,11 @@
       </div>
 
       <div class="chart-grid">
-        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
+        <div class="chart-card">
           <h3>Round-Trip Time</h3>
           <p style="color:var(--grey);font-size:14px;">Network RTT between UCL and Nottingham over 437 seconds.</p>
           <div class="chart-area"><canvas id="rtt-chart"></canvas></div>
-          <div class="chart-card-interp-toggle">
+          <div class="chart-card-interp-toggle" onclick="event.stopPropagation();this.closest('.chart-card').classList.toggle('interp-open')">
             <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
             <span>Interpretation</span>
           </div>
@@ -627,11 +627,11 @@
             <p><strong>Session events.</strong> The audit log shows a burst of <code>link_degraded</code> rejections near t=420 s, correlating with RTT spikes. Network instability directly impacts teleoperation reliability.</p>
           </div>
         </div>
-        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
+        <div class="chart-card">
           <h3>Command Latency Distribution</h3>
           <p style="color:var(--grey);font-size:14px;">Relay round-trip times for 4,220 commands.</p>
           <div class="chart-area"><canvas id="latency-chart"></canvas></div>
-          <div class="chart-card-interp-toggle">
+          <div class="chart-card-interp-toggle" onclick="event.stopPropagation();this.closest('.chart-card').classList.toggle('interp-open')">
             <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
             <span>Interpretation</span>
           </div>
@@ -649,11 +649,11 @@
       <p class="section-desc">End-effector (TCP) position and joint angles recorded at 5 Hz · 712 TCP samples · 717 joint samples · 2,128 operations</p>
 
       <div class="chart-grid">
-        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
+        <div class="chart-card">
           <h3>Operation Breakdown</h3>
           <p style="color:var(--grey);font-size:14px;">Commands sent to the UR5e during the session.</p>
           <div class="chart-area" style="height:220px;"><canvas id="ops-chart"></canvas></div>
-          <div class="chart-card-interp-toggle">
+          <div class="chart-card-interp-toggle" onclick="event.stopPropagation();this.closest('.chart-card').classList.toggle('interp-open')">
             <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
             <span>Interpretation</span>
           </div>
@@ -661,11 +661,11 @@
             <p><strong>Command mix.</strong> The session is dominated by <code>speedl</code> (linear velocity) commands, with brief <code>speedl_stop</code> pauses. This pattern reflects smooth, continuous teleoperation rather than discrete pick-and-place motions.</p>
           </div>
         </div>
-        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
+        <div class="chart-card">
           <h3>TCP End-Effector Speed</h3>
           <p style="color:var(--grey);font-size:14px;">Cartesian speed of the tool tip, derived from consecutive TCP samples.</p>
           <div class="chart-area" style="height:220px;"><canvas id="speed-chart"></canvas></div>
-          <div class="chart-card-interp-toggle">
+          <div class="chart-card-interp-toggle" onclick="event.stopPropagation();this.closest('.chart-card').classList.toggle('interp-open')">
             <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
             <span>Interpretation</span>
           </div>
@@ -673,11 +673,11 @@
             <p><strong>Speed profile.</strong> Speed varies significantly — periods of near-zero speed alternate with faster movements. Speed spikes reveal rapid repositioning commands, the most latency-sensitive phases for sim2real fidelity.</p>
           </div>
         </div>
-        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
+        <div class="chart-card">
           <h3>TCP Trajectory (XY Plane)</h3>
           <p style="color:var(--grey);font-size:14px;">Top-down view of the end-effector path.</p>
           <div class="chart-area" style="height:300px;"><canvas id="trajectory-chart"></canvas></div>
-          <div class="chart-card-interp-toggle">
+          <div class="chart-card-interp-toggle" onclick="event.stopPropagation();this.closest('.chart-card').classList.toggle('interp-open')">
             <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
             <span>Interpretation</span>
           </div>
@@ -685,11 +685,11 @@
             <p><strong>Trajectory pattern.</strong> The TCP trajectory shows the robot operated within a compact workspace, with the end-effector moving primarily in the XY plane. Clusters indicate repeated positioning tasks or fine adjustments during teleoperation.</p>
           </div>
         </div>
-        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
+        <div class="chart-card">
           <h3>Joint Angles</h3>
           <p style="color:var(--grey);font-size:14px;">All six joint angles (degrees) over the session.</p>
           <div class="chart-area" style="height:300px;"><canvas id="joint-chart"></canvas></div>
-          <div class="chart-card-interp-toggle">
+          <div class="chart-card-interp-toggle" onclick="event.stopPropagation();this.closest('.chart-card').classList.toggle('interp-open')">
             <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
             <span>Interpretation</span>
           </div>
@@ -783,7 +783,7 @@
 
       <!-- Combined Metrics -->
       <div class="chart-grid">
-        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
+        <div class="chart-card">
           <div class="stats-strip" style="grid-template-columns: 1fr; margin: 0 0 16px;">
             <div class="stats-strip-item" style="border:none;">
               <div class="stats-strip-value" id="metric-nfi" style="font-size:2rem;">—</div>
@@ -796,7 +796,7 @@
             <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-jnorm">—</div><div class="stats-strip-label">J<sub>norm</sub></div></div>
             <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-lrate">—</div><div class="stats-strip-label">L<sub>rate</sub></div></div>
           </div>
-          <div class="chart-card-interp-toggle">
+          <div class="chart-card-interp-toggle" onclick="event.stopPropagation();this.closest('.chart-card').classList.toggle('interp-open')">
             <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
             <span>Interpretation</span>
           </div>
@@ -805,7 +805,7 @@
             <p><strong>Adoption across SONAIR.</strong> NFI uses a 0–1 format, making network timing quality directly comparable across federation nodes.</p>
           </div>
         </div>
-        <div class="chart-card" onclick="this.classList.toggle('interp-open')">
+        <div class="chart-card">
           <div class="stats-strip" style="grid-template-columns: 1fr; margin: 0 0 16px;">
             <div class="stats-strip-item" style="border:none;">
               <div class="stats-strip-value" id="metric-taf" style="font-size:2rem;">—</div>
@@ -818,7 +818,7 @@
             <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-orientation-rmse">—</div><div class="stats-strip-label">Ori RMSE</div></div>
             <div class="stats-strip-item"><div class="stats-strip-value" style="font-size:1.1rem;" id="metric-tracking-lag">—</div><div class="stats-strip-label">Median Lag</div></div>
           </div>
-          <div class="chart-card-interp-toggle">
+          <div class="chart-card-interp-toggle" onclick="event.stopPropagation();this.closest('.chart-card').classList.toggle('interp-open')">
             <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
             <span>Interpretation</span>
           </div>
@@ -833,7 +833,7 @@
         <h3>NFI vs TAF Over Time</h3>
         <p style="color:var(--grey);font-size:14px;">Network fidelity (purple) and tracking fidelity (blue) on the same 437 s timeline. Both use a 0–1 scale; higher = better.</p>
         <div class="chart-area" style="height:300px;"><canvas id="combined-metric-chart"></canvas></div>
-        <div class="chart-card-interp-toggle">
+        <div class="chart-card-interp-toggle" onclick="event.stopPropagation();this.closest('.chart-card').classList.toggle('interp-open')">
           <div class="chart-card-interp-arrow"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
           <span>Interpretation</span>
         </div>
