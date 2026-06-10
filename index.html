@@ -400,6 +400,7 @@
           </div>
           <h3>Contact</h3>
           <p><a href="mailto:yutong.song.25@ucl.ac.uk">yutong.song.25@ucl.ac.uk</a></p>
+          <p>Zachary WU · <a href="mailto:ucemz16@ucl.ac.uk">ucemz16@ucl.ac.uk</a></p>
         </div>
       </div>
     </section>
@@ -591,17 +592,10 @@
         </div>
       </div>
 
-      <div class="chart-grid">
-        <div class="chart-card">
-          <h3>Target vs Actual TCP Path</h3>
-          <p style="color:var(--grey);font-size:14px;">Representative normal operation 23. Near-overlap indicates accurate Cartesian tracking.</p>
-          <div class="chart-area" style="height:300px;"><canvas id="tracking-path-chart"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <h3>TAF Across 75 Operations</h3>
-          <p style="color:var(--grey);font-size:14px;">Each point is one assembly operation; higher values indicate tighter target–actual tracking.</p>
-          <div class="chart-area" style="height:300px;"><canvas id="tracking-score-chart"></canvas></div>
-        </div>
+      <div class="chart-card">
+        <h3>TCP Position Tracking Error Over Time</h3>
+        <p style="color:var(--grey);font-size:14px;">Three-dimensional distance between target and actual TCP position during representative normal operation 23. Lower is better.</p>
+        <div class="chart-area" style="height:320px;"><canvas id="tracking-error-chart"></canvas></div>
       </div>
 
       <h3 style="margin-top:28px;">Interpretation</h3>
@@ -634,6 +628,7 @@
       </div>
       <div>
         <a href="mailto:yutong.song.25@ucl.ac.uk">yutong.song.25@ucl.ac.uk</a>
+        <p style="margin-top:4px;">Zachary WU · <a href="mailto:ucemz16@ucl.ac.uk">ucemz16@ucl.ac.uk</a></p>
         <p style="margin-top:4px;">&copy; 2026 University College London</p>
       </div>
     </div>
@@ -759,50 +754,35 @@
     });
 
     const examplePath = TRACKING_FIDELITY.example_trajectory;
-    new Chart(document.getElementById('tracking-path-chart'), {
-      type: 'scatter',
-      data: { datasets: [
-        {
-          label: 'Target',
-          data: examplePath.map(d=>({x:d.target_x,y:d.target_y})),
-          borderColor: cPurple, backgroundColor: cPurple, borderWidth: 2,
-          pointRadius: 0, showLine: true, tension: 0.15
-        },
-        {
-          label: 'Actual',
-          data: examplePath.map(d=>({x:d.actual_x,y:d.actual_y})),
-          borderColor: '#00BDF2', backgroundColor: '#00BDF2', borderWidth: 1.5,
-          pointRadius: 0, showLine: true, tension: 0.15
-        }
-      ] },
-      options: { responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom', labels: { color: cTick, font: { size: 11 } } } },
-        scales: {
-          x: { title: { display: true, text: 'TCP X (mm)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid } },
-          y: { title: { display: true, text: 'TCP Y (mm)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid } }
-        }
-      }
+    const trackingError = examplePath.map(d => {
+      const dx = d.actual_x - d.target_x;
+      const dy = d.actual_y - d.target_y;
+      const dz = d.actual_z - d.target_z;
+      return Math.sqrt(dx * dx + dy * dy + dz * dz);
     });
-
-    const outcomeColours = {
-      normal_operation: '#500778',
-      damaged_screw_thread: '#D64545',
-      extra_assembly_component: '#E0A030',
-      missing_screw: '#00BDF2',
-      damaged_plate_thread: '#8C2DA7'
-    };
-    new Chart(document.getElementById('tracking-score-chart'), {
-      type: 'scatter',
-      data: { datasets: Object.keys(outcomeColours).map(outcome=>({
-        label: outcome.replaceAll('_',' '),
-        data: TRACKING_FIDELITY.operations.filter(d=>d.outcome===outcome).map(d=>({x:d.id,y:d.score})),
-        backgroundColor: outcomeColours[outcome], pointRadius: 4
-      })) },
+    new Chart(document.getElementById('tracking-error-chart'), {
+      type: 'line',
+      data: {
+        labels: examplePath.map(d=>d.t),
+        datasets: [{
+          label: '3D position error',
+          data: trackingError,
+          borderColor: cPurple,
+          backgroundColor: 'rgba(80,7,120,.10)',
+          borderWidth: 2,
+          pointRadius: 0,
+          fill: true,
+          tension: 0.2
+        }]
+      },
       options: { responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom', labels: { color: cTick, font: { size: 10 }, boxWidth: 10 } } },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: context => context.parsed.y.toFixed(3) + ' mm' } }
+        },
         scales: {
-          x: { title: { display: true, text: 'Operation ID', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid } },
-          y: { title: { display: true, text: 'TAF', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, min: 0.5, max: 1 }
+          x: { title: { display: true, text: 'Time (s)', color: cTick, font: cFont }, ticks: { color: cTick, maxTicksLimit: 12, font: { size: 11 } }, grid: { color: cGrid } },
+          y: { title: { display: true, text: '3D position error (mm)', color: cTick, font: cFont }, ticks: { color: cTick, font: { size: 11 } }, grid: { color: cGrid }, beginAtZero: true }
         }
       }
     });

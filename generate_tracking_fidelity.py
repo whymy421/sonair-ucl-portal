@@ -211,8 +211,10 @@ def build_analysis(path: Path) -> dict:
                 "t": round(float(row.elapsed_s), 3),
                 "target_x": round(float(row.target_TCP_pose_0) * 1000, 3),
                 "target_y": round(float(row.target_TCP_pose_1) * 1000, 3),
+                "target_z": round(float(row.target_TCP_pose_2) * 1000, 3),
                 "actual_x": round(float(row.actual_TCP_pose_0) * 1000, 3),
                 "actual_y": round(float(row.actual_TCP_pose_1) * 1000, 3),
+                "actual_z": round(float(row.actual_TCP_pose_2) * 1000, 3),
             }
             for row in example.itertuples()
         ],
