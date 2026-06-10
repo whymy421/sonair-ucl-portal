@@ -3,210 +3,309 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>UCL Robotics SONAIR Sub-Portal</title>
+  <title>UCL Robotics — SONAIR Sub-Portal</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>
-    :root { --primary:#500778; --bright:#AC10E6; --mid:#8B2DB5; --heritage:#00BDF2; --light:#D1B2E0; --pale:#E6D6F0; --bg:#07101a; --panel:#0b1622; --text:#F0EDE8; --muted:#D1B2E0; --accent:#AC10E6; }
+    /* ── Typography scale ── */
+    :root {
+      --primary: #500778;
+      --bright: #AC10E6;
+      --heritage: #00BDF2;
+      --text: #1C1C1C;
+      --text-secondary: #555;
+      --text-caption: #777;
+      --border: #E5E5E5;
+      --bg: #FFFFFF;
+      --bg-subtle: #F7F5F2;
+      --bg-section: #FAF8F6;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, -apple-system, Segoe UI, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
-    header, main { width: min(1100px, 92vw); margin: auto; }
 
-    header { padding: 38px 0 22px; border-bottom: 1px solid rgba(255,255,255,.12); display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-    .logo { height: 56px; border-radius: 8px; }
-    .header-text { flex: 1; }
-    h1 { margin: 0 0 4px; font-size: clamp(24px, 4vw, 44px); }
-    h2 { color: var(--primary); margin: 0 0 10px; font-size: 20px; }
-    h3 { color: var(--heritage); margin: 0 0 8px; font-size: 16px; }
-    .muted { color: var(--muted); line-height: 1.6; }
-    .badge { display: inline-block; border: 1px solid var(--heritage); color: var(--heritage); border-radius: 999px; padding: 4px 12px; font-size: 12px; font-weight: 600; }
-    a { color: var(--primary); }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+    }
 
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 22px 0; }
-    .card { background: var(--panel); border: 1px solid rgba(172,16,230,.25); border-radius: 16px; padding: 20px; }
-    .card-highlight { border-color: var(--accent); box-shadow: 0 0 20px rgba(168,85,247,.08); }
+    /* ── Layout ── */
+    .container { width: min(920px, 90vw); margin: 0 auto; }
 
-    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 16px 0; }
-    .stat { background: rgba(172,16,230,.08); border: 1px solid rgba(172,16,230,.25); border-radius: 10px; padding: 14px; text-align: center; }
-    .stat-value { font-size: 28px; font-weight: 700; color: var(--heritage); }
-    .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-top: 4px; }
+    /* ── Headings ── */
+    h1 { font-size: 32px; font-weight: 700; line-height: 1.2; letter-spacing: -0.5px; color: var(--primary); }
+    h2 { font-size: 22px; font-weight: 700; line-height: 1.3; color: var(--primary); margin-bottom: 8px; }
+    h3 { font-size: 16px; font-weight: 600; line-height: 1.4; color: var(--text); margin-bottom: 6px; }
+    .caption { font-size: 13px; color: var(--text-caption); line-height: 1.5; }
+    .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-caption); }
 
-    .chart-container { position: relative; height: 320px; margin: 16px 0; }
-    .chart-container canvas { border-radius: 8px; }
+    p { margin-bottom: 12px; }
+    p:last-child { margin-bottom: 0; }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    strong { font-weight: 600; }
+    code { font-family: 'SF Mono', 'Menlo', monospace; font-size: 13px; background: var(--bg-subtle); padding: 1px 5px; border-radius: 3px; }
 
-    .interpretation { background: rgba(0,189,242,.06); border-left: 3px solid var(--heritage); padding: 16px 20px; border-radius: 0 10px 10px 0; margin: 16px 0; font-size: 14px; }
-    .interpretation p { margin-bottom: 10px; }
-    .interpretation p:last-child { margin-bottom: 0; }
+    /* ── Header ── */
+    header {
+      padding: 32px 0 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-logo { height: 40px; }
+    .header-meta { margin-top: 10px; }
+    .header-meta span { font-size: 13px; color: var(--text-caption); }
+    .header-meta span + span::before { content: '·'; margin: 0 8px; }
 
-    .metric-card { background: linear-gradient(135deg, rgba(80,7,120,.18), rgba(0,189,242,.06)); border: 1px solid var(--bright); border-radius: 16px; padding: 24px; margin: 22px 0; }
-    .metric-formula { background: rgba(0,0,0,.3); border-radius: 8px; padding: 14px 20px; font-family: 'Courier New', monospace; font-size: 15px; color: var(--heritage); margin: 12px 0; text-align: center; letter-spacing: 1px; }
+    /* ── Sections ── */
+    section { padding: 36px 0; }
+    section + section { border-top: 1px solid var(--border); }
 
-    .section-title { font-size: 24px; margin: 40px 0 6px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.08); }
-    .section-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    .section-header { margin-bottom: 20px; }
+    .section-header h2 { margin-bottom: 4px; }
 
-    .tag { display: inline-block; background: rgba(0,189,242,.1); border: 1px solid rgba(0,189,242,.3); color: var(--heritage); border-radius: 6px; padding: 2px 8px; font-size: 11px; margin: 2px 4px 2px 0; }
+    /* ── Two-column layout ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+    @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; gap: 24px; } }
 
-    #requests-inbox { margin-top: 14px; }
+    /* ── Stats row ── */
+    .stats-row { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 20px 0; }
+    .stat-item { flex: 1; padding: 16px 12px; text-align: center; }
+    .stat-item + .stat-item { border-left: 1px solid var(--border); }
+    .stat-value { font-size: 24px; font-weight: 700; color: var(--primary); line-height: 1.2; }
+    .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-caption); margin-top: 4px; }
 
-    .collab-buttons { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-    .collab-btn { padding: 8px 20px; border-radius: 8px; border: 1px solid var(--primary); background: rgba(80,7,120,.15); color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s; }
-    .collab-btn:hover { background: rgba(80,7,120,.3); }
+    /* ── Charts ── */
+    .chart-wrap { position: relative; height: 300px; margin: 16px 0 8px; }
+
+    /* ── Interpretation block ── */
+    .interp { border-left: 3px solid var(--primary); padding: 16px 20px; background: var(--bg-subtle); border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 14px; color: var(--text-secondary); }
+    .interp p { margin-bottom: 10px; }
+    .interp strong { color: var(--text); }
+
+    /* ── Metric section ── */
+    .formula-block {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 20px;
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 15px;
+      color: var(--primary);
+      text-align: center;
+      margin: 12px 0 16px;
+      letter-spacing: 0.5px;
+    }
+    .def-list { padding-left: 20px; margin: 8px 0 16px; color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
+
+    /* ── Tags ── */
+    .tag { display: inline-block; font-size: 12px; color: var(--text-caption); background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; margin: 2px 4px 2px 0; }
+
+    /* ── Buttons ── */
+    .btn { display: inline-block; padding: 8px 20px; font-size: 14px; font-weight: 600; border-radius: 6px; border: 1px solid var(--primary); cursor: pointer; font-family: inherit; transition: background .15s, color .15s; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: #3d0560; }
+    .btn-secondary { background: #fff; color: var(--primary); }
+    .btn-secondary:hover { background: var(--bg-subtle); }
+
+    /* ── Inbox ── */
+    #requests-inbox { margin-top: 12px; }
+
+    /* ── Footer ── */
+    footer { padding: 32px 0; border-top: 1px solid var(--border); margin-top: 0; }
+    footer p { font-size: 13px; color: var(--text-caption); margin: 0; }
   </style>
 </head>
 <body>
+
+  <!-- ── Header ── -->
   <header>
-    <img id="logo" class="logo" alt="UCL Logo" src="" style="display:none;" />
-    <div class="header-text">
-      <span class="badge" id="city">London</span>
-      <h1 id="institution">University College London</h1>
-      <p class="muted" id="node-name">UCL Robotics Evidence Node</p>
+    <div class="container">
+      <div class="header-row">
+        <svg id="ucl-logo" class="header-logo" viewBox="0 0 280 80" xmlns="http://www.w3.org/2000/svg">
+          <text x="0" y="58" font-family="system-ui, sans-serif" font-size="62" font-weight="800" fill="#500778" letter-spacing="-2">UCL</text>
+          <rect x="175" y="5" width="70" height="70" rx="4" fill="#AC10E6"/>
+          <rect x="181" y="40" width="8" height="35" fill="#fff"/>
+          <rect x="193" y="40" width="8" height="35" fill="#fff"/>
+          <rect x="205" y="40" width="8" height="35" fill="#fff"/>
+          <rect x="217" y="40" width="8" height="35" fill="#fff"/>
+          <rect x="229" y="40" width="8" height="35" fill="#fff"/>
+          <path d="M205,38 Q205,15 220,10 Q235,15 235,38 Z" fill="#fff"/>
+        </svg>
+        <div>
+          <h1 id="institution">University College London</h1>
+          <div class="header-meta">
+            <span id="node-name">UCL Robotics Evidence Node</span>
+            <span id="city">London</span>
+            <span>SONAIR Network</span>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main>
-    <!-- Lab Overview Cards -->
-    <section class="grid" aria-label="Portal overview">
-      <article class="card">
-        <h2>Lab Identity</h2>
-        <p class="muted">The UCL Robotics Lab focuses on remote teleoperation, sim2real transfer, and networked robot control. Our team investigates how network latency and jitter affect the fidelity of robot commands transmitted between simulation environments and physical hardware.</p>
-        <p class="muted" style="margin-top:10px;">We are open to collaboration on federated benchmarking, cross-institutional teleoperation experiments, and shared dataset curation for the SONAIR network.</p>
-      </article>
-      <article class="card">
-        <h2>Equipment &amp; Datasets</h2>
-        <p class="muted"><strong>UR5e Robot Arm</strong> — 6-DOF collaborative robot used in UCL–Nottingham teleoperation experiments. UCL remotely operates the arm while the physical robot is located at the University of Nottingham.</p>
-        <div style="margin-top:10px;">
-          <span class="tag">UR5e</span>
-          <span class="tag">Teleoperation</span>
-          <span class="tag">RTT Dataset</span>
-          <span class="tag">Command Latency</span>
-          <span class="tag">Session Audit</span>
+  <div class="container">
+
+    <!-- ── About ── -->
+    <section>
+      <div class="two-col">
+        <div>
+          <div class="section-header">
+            <h2>About the Lab</h2>
+          </div>
+          <p>The UCL Robotics Lab focuses on remote teleoperation, sim2real transfer, and networked robot control. We investigate how network latency and jitter affect the fidelity of commands transmitted between simulation environments and physical hardware.</p>
+          <p>We are open to collaboration on federated benchmarking, cross-institutional teleoperation experiments, and shared dataset curation for the SONAIR network.</p>
+          <div style="margin-top:16px;">
+            <button class="btn btn-primary" onclick="SONAIR_REQUESTS.openForm('collab')">Apply to Collaborate</button>
+            <button class="btn btn-secondary" style="margin-left:8px;" onclick="SONAIR_REQUESTS.openForm('visit')">Apply to Visit</button>
+          </div>
         </div>
-      </article>
-      <article class="card">
-        <h2>Collaboration Contact</h2>
-        <p class="muted">We welcome enquiries from universities, industry partners, and research councils interested in sim2real benchmarking.</p>
-        <p class="muted" style="margin-top:10px;">Email: <a href="mailto:songyutong@ucl.ac.uk">songyutong@ucl.ac.uk</a></p>
-        <div class="collab-buttons">
-          <button class="collab-btn" onclick="SONAIR_REQUESTS.openForm('visit')">Apply to Visit</button>
-          <button class="collab-btn" onclick="SONAIR_REQUESTS.openForm('collab')">Apply to Collaborate</button>
+        <div>
+          <div class="section-header">
+            <h2>Equipment &amp; Contact</h2>
+          </div>
+          <h3>UR5e Robot Arm</h3>
+          <p class="caption">6-DOF collaborative robot used in UCL–Nottingham teleoperation experiments. UCL remotely operates the arm while the physical robot is at the University of Nottingham.</p>
+          <div style="margin:12px 0;">
+            <span class="tag">UR5e</span>
+            <span class="tag">Teleoperation</span>
+            <span class="tag">RTT Dataset</span>
+            <span class="tag">Command Latency</span>
+            <span class="tag">Session Audit</span>
+          </div>
+          <p style="margin-top:16px;"><strong>Contact:</strong> <a href="mailto:songyutong@ucl.ac.uk">songyutong@ucl.ac.uk</a></p>
         </div>
-      </article>
-    </section>
-
-    <!-- Dashboard Section -->
-    <h2 class="section-title">Robot Data Dashboard</h2>
-    <p class="section-subtitle">UCL–Nottingham UR5e teleoperation session &middot; 437 seconds &middot; 1,750 RTT samples &middot; 4,220 commands</p>
-
-    <!-- Summary Stats -->
-    <div class="stat-grid">
-      <div class="stat">
-        <div class="stat-value" id="stat-mean-rtt">—</div>
-        <div class="stat-label">Mean RTT</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value" id="stat-p95-rtt">—</div>
-        <div class="stat-label">P95 RTT</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value" id="stat-mean-latency">—</div>
-        <div class="stat-label">Mean Cmd Latency</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value" id="stat-packet-loss">—</div>
-        <div class="stat-label">Packet Loss Rate</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value" id="stat-s2r-score">—</div>
-        <div class="stat-label">S2R Gap Score</div>
-      </div>
-    </div>
-
-    <!-- RTT Time Series -->
-    <section class="card">
-      <h2>RTT Time-Series</h2>
-      <p class="muted">Round-trip time measured over the teleoperation session. Vertical dashed lines mark session events (GRANT, link degradation).</p>
-      <div class="chart-container">
-        <canvas id="rtt-chart"></canvas>
       </div>
     </section>
 
-    <!-- Command Latency Histogram -->
-    <section class="card" style="margin-top:16px;">
-      <h2>Command Latency Distribution</h2>
-      <p class="muted">Histogram of relay round-trip times for all 4,220 commands sent during the session.</p>
-      <div class="chart-container">
-        <canvas id="latency-chart"></canvas>
+    <!-- ── Dashboard ── -->
+    <section>
+      <div class="section-header">
+        <h2>Robot Data Dashboard</h2>
+        <p class="caption">UCL–Nottingham UR5e teleoperation session · 437 seconds · 1,750 RTT samples · 4,220 commands</p>
       </div>
-    </section>
 
-    <!-- Written Interpretation -->
-    <section class="card" style="margin-top:16px;">
-      <h2>Interpretation</h2>
-      <div class="interpretation">
-        <p><strong>Network Stability:</strong> The mean RTT of ~55 ms with a range of 14–401 ms indicates generally responsive network conditions, but with significant outlier spikes. The P95 RTT reveals that 5% of measurements exceed a much higher threshold, suggesting intermittent congestion or routing variability on the UCL–Nottingham link.</p>
-        <p><strong>Command Latency:</strong> The command latency histogram clusters tightly around 20–40 ms for the majority of commands, which is acceptable for non-safety-critical teleoperation. However, a long tail extending beyond 100 ms means that some robot commands experience delays that could cause visible desynchronisation between the operator's input and the robot's physical response.</p>
-        <p><strong>Sim2Real Implication:</strong> In simulation, commands execute instantaneously with zero network delay. In the real teleoperation setup, the variable latency introduces a timing gap — the sim2real gap. A robot trajectory planned in simulation at 50 Hz assumes each command arrives within 20 ms, but the real network delivers commands with a standard deviation of ~25 ms. This means the physical robot's trajectory will diverge from the simulated one, particularly during high-speed motions or precision tasks.</p>
-        <p><strong>Session Events:</strong> The session audit log shows a burst of <code>link_degraded</code> rejections near the end of the session (around t=420s), correlating with RTT spikes visible in the time-series plot. This confirms that network instability directly impacts teleoperation reliability and contributes to the sim2real gap.</p>
-      </div>
-    </section>
-
-    <!-- Challenge 1: Sim2Real Gap Metric -->
-    <h2 class="section-title">Challenge 1 — Sim2Real Gap Metric</h2>
-    <p class="section-subtitle">A novel metric to quantify the simulation-to-real timing gap for networked teleoperation</p>
-
-    <div class="metric-card">
-      <h2 style="color:var(--accent);margin-bottom:8px;">Temporal Fidelity Index (TFI)</h2>
-      <p class="muted">We propose the <strong>Temporal Fidelity Index (TFI)</strong> — a composite metric that captures how faithfully a real networked teleoperation system reproduces the timing assumptions of its simulation counterpart.</p>
-
-      <h3 style="margin-top:16px;">Definition</h3>
-      <div class="metric-formula">
-        TFI = (1 - D_norm) &times; (1 - J_norm) &times; (1 - L_rate)
-      </div>
-      <p class="muted">Where:</p>
-      <ul class="muted" style="padding-left:20px; margin:8px 0;">
-        <li><strong>D_norm</strong> = normalised mean excess delay = mean(RTT - RTT_sim) / RTT_max, where RTT_sim = 0 ms (ideal simulation)</li>
-        <li><strong>J_norm</strong> = normalised jitter = std(RTT) / RTT_max, capturing timing unpredictability</li>
-        <li><strong>L_rate</strong> = packet loss rate = lost_packets / total_packets</li>
-      </ul>
-
-      <h3 style="margin-top:16px;">Why It Matters</h3>
-      <p class="muted">Existing sim2real metrics focus on positional or visual accuracy. TFI specifically targets the <em>temporal</em> dimension — the gap between when a command should arrive (simulation assumption) and when it actually arrives (real network). For teleoperation, timing fidelity is often more critical than positional accuracy because delayed commands accumulate into trajectory divergence.</p>
-
-      <h3 style="margin-top:16px;">Calculated Result</h3>
-      <div class="stat-grid">
-        <div class="stat">
-          <div class="stat-value" id="metric-dnorm">—</div>
-          <div class="stat-label">D_norm (delay)</div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-value" id="stat-mean-rtt">—</div>
+          <div class="stat-label">Mean RTT</div>
         </div>
-        <div class="stat">
-          <div class="stat-value" id="metric-jnorm">—</div>
-          <div class="stat-label">J_norm (jitter)</div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-p95-rtt">—</div>
+          <div class="stat-label">P95 RTT</div>
         </div>
-        <div class="stat">
-          <div class="stat-value" id="metric-lrate">—</div>
-          <div class="stat-label">L_rate (loss)</div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-mean-latency">—</div>
+          <div class="stat-label">Mean Cmd Latency</div>
         </div>
-        <div class="stat">
-          <div class="stat-value" id="metric-tfi">—</div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-packet-loss">—</div>
+          <div class="stat-label">Packet Loss</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-s2r-score">—</div>
           <div class="stat-label">TFI Score</div>
         </div>
       </div>
 
-      <!-- TFI over time chart -->
-      <div class="chart-container" style="height:260px;">
+      <!-- RTT chart -->
+      <h3>Round-Trip Time Over Session</h3>
+      <p class="caption">Network RTT measured between UCL (sender) and Nottingham (receiver) over 437 seconds.</p>
+      <div class="chart-wrap">
+        <canvas id="rtt-chart"></canvas>
+      </div>
+
+      <!-- Latency histogram -->
+      <h3 style="margin-top:32px;">Command Latency Distribution</h3>
+      <p class="caption">Histogram of relay round-trip times for 4,220 commands. Colour indicates severity: normal (&lt;60 ms), elevated (60–100 ms), high (&gt;100 ms).</p>
+      <div class="chart-wrap" style="height:260px;">
+        <canvas id="latency-chart"></canvas>
+      </div>
+
+      <!-- Interpretation -->
+      <h3 style="margin-top:32px;">Interpretation</h3>
+      <div class="interp">
+        <p><strong>Network stability.</strong> The mean RTT of ~55 ms with a range of 14–401 ms indicates generally responsive conditions, but with significant outlier spikes. The P95 value shows that 5% of measurements exceed a much higher threshold, suggesting intermittent congestion on the UCL–Nottingham link.</p>
+        <p><strong>Command latency.</strong> The histogram clusters tightly around 20–40 ms for the majority of commands — acceptable for non-safety-critical teleoperation. However, a long tail beyond 100 ms means some commands experience delays that could cause visible desynchronisation between operator input and robot response.</p>
+        <p><strong>Sim2real implication.</strong> In simulation, commands execute instantaneously. In the real setup, variable latency introduces a timing gap. A trajectory planned at 50 Hz assumes each command arrives within 20 ms, but the network delivers with a standard deviation of ~25 ms. The physical robot's trajectory will diverge from the simulated one, particularly during high-speed motions.</p>
+        <p><strong>Session events.</strong> The audit log shows a burst of <code>link_degraded</code> rejections near t=420 s, correlating with RTT spikes in the time-series. Network instability directly impacts teleoperation reliability.</p>
+      </div>
+    </section>
+
+    <!-- ── Challenge 1: TFI Metric ── -->
+    <section>
+      <div class="section-header">
+        <h2>Sim2Real Gap Metric — Temporal Fidelity Index</h2>
+        <p class="caption">Challenge 1: A novel metric to quantify the simulation-to-real timing gap for networked teleoperation.</p>
+      </div>
+
+      <p>We propose the <strong>Temporal Fidelity Index (TFI)</strong> — a composite metric that captures how faithfully a real networked teleoperation system reproduces the timing assumptions of its simulation counterpart. Existing sim2real metrics focus on positional or visual accuracy; TFI targets the <em>temporal</em> dimension.</p>
+
+      <h3 style="margin-top:24px;">Definition</h3>
+      <div class="formula-block">
+        TFI = (1 − D<sub>norm</sub>) × (1 − J<sub>norm</sub>) × (1 − L<sub>rate</sub>)
+      </div>
+      <ul class="def-list">
+        <li><strong>D<sub>norm</sub></strong> — normalised mean excess delay = mean(RTT) / max(RTT). Measures average delay relative to worst case.</li>
+        <li><strong>J<sub>norm</sub></strong> — normalised jitter = std(RTT) / max(RTT). Captures timing unpredictability.</li>
+        <li><strong>L<sub>rate</sub></strong> — packet loss rate = lost / total. Measures data loss.</li>
+      </ul>
+
+      <h3>Calculated Result</h3>
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-value" id="metric-dnorm">—</div>
+          <div class="stat-label">D<sub>norm</sub></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="metric-jnorm">—</div>
+          <div class="stat-label">J<sub>norm</sub></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="metric-lrate">—</div>
+          <div class="stat-label">L<sub>rate</sub></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="metric-tfi">—</div>
+          <div class="stat-label">TFI</div>
+        </div>
+      </div>
+
+      <h3>TFI Over Time</h3>
+      <p class="caption">Rolling-window TFI (window = 50 samples) across the session. Dips correspond to latency spikes and link degradation events.</p>
+      <div class="chart-wrap" style="height:240px;">
         <canvas id="tfi-chart"></canvas>
       </div>
 
-      <h3 style="margin-top:16px;">How to Adopt Across SONAIR</h3>
-      <p class="muted">TFI can be computed for any teleoperation session that logs RTT and packet loss. Each campus node in the SONAIR network could publish its TFI alongside raw data, enabling cross-institutional comparison: which network links and configurations yield higher temporal fidelity? Over time, a TFI leaderboard could drive improvements in teleoperation infrastructure, identify bottleneck links, and establish minimum fidelity thresholds for safety-critical applications.</p>
-    </div>
+      <h3 style="margin-top:28px;">Why It Matters</h3>
+      <p>For teleoperation, timing fidelity is often more critical than positional accuracy — delayed commands accumulate into trajectory divergence. A robot trajectory planned in simulation at 50 Hz assumes each command arrives within 20 ms, but the real network introduces variable delays that compound over time.</p>
 
-    <!-- Requests Inbox -->
-    <section class="card" style="margin-top:16px;">
-      <h2>Requests Inbox</h2>
-      <p class="muted">Access or collaboration requests routed to the UCL campus node will appear here.</p>
+      <h3 style="margin-top:20px;">Adoption Across SONAIR</h3>
+      <p>TFI can be computed for any teleoperation session that logs RTT and packet loss. Each campus node could publish its TFI alongside raw data, enabling cross-institutional comparison. Over time, a TFI benchmark could identify bottleneck links and establish minimum fidelity thresholds for safety-critical applications.</p>
+    </section>
+
+    <!-- ── Requests Inbox ── -->
+    <section>
+      <div class="section-header">
+        <h2>Requests Inbox</h2>
+        <p class="caption">Access or collaboration requests routed to the UCL campus node appear here.</p>
+      </div>
       <div id="requests-inbox"></div>
     </section>
-  </main>
+
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>UCL Robotics Evidence Node · SONAIR Network · <a href="mailto:songyutong@ucl.ac.uk">songyutong@ucl.ac.uk</a></p>
+    </div>
+  </footer>
 
   <!-- Theme loader -->
   <script>
@@ -218,11 +317,6 @@
         document.getElementById('node-name').textContent = config.node_name || 'UCL Robotics Evidence Node';
         document.getElementById('city').textContent = config.city || 'London';
         document.title = (config.institution_name || 'UCL') + ' — SONAIR Sub-Portal';
-        if (config.logo_url) {
-          const logo = document.getElementById('logo');
-          logo.src = config.logo_url;
-          logo.style.display = 'block';
-        }
       })
       .catch(() => console.warn('theme.config.json could not be loaded'));
   </script>
@@ -233,14 +327,11 @@
     window.SONAIR_API_BASE = 'http://EVENT_REQUEST_API:5055';
   </script>
   <script src="sonair_request_system.js"></script>
-  <script>
-    SONAIR_REQUESTS.renderInbox('requests-inbox');
-  </script>
+  <script>SONAIR_REQUESTS.renderInbox('requests-inbox');</script>
 
   <!-- Data & Dashboard -->
   <script src="data.js"></script>
   <script>
-    // --- Compute statistics ---
     const rtts = RTT_DATA.map(d => d.rtt);
     const meanRTT = rtts.reduce((a,b) => a+b, 0) / rtts.length;
     const sortedRTTs = [...rtts].sort((a,b) => a-b);
@@ -259,7 +350,6 @@
     document.getElementById('stat-mean-latency').textContent = meanLatency.toFixed(1) + ' ms';
     document.getElementById('stat-packet-loss').textContent = (lossRate * 100).toFixed(1) + '%';
 
-    // --- TFI Metric ---
     const D_norm = meanRTT / maxRTT;
     const J_norm = stdRTT / maxRTT;
     const L_rate = lossRate;
@@ -271,116 +361,85 @@
     document.getElementById('metric-lrate').textContent = L_rate.toFixed(3);
     document.getElementById('metric-tfi').textContent = TFI.toFixed(3);
 
-    // --- RTT Time-Series Chart ---
-    const rttCtx = document.getElementById('rtt-chart').getContext('2d');
-    new Chart(rttCtx, {
+    const chartFont = { family: "system-ui, -apple-system, sans-serif" };
+    const gridColor = '#E5E5E5';
+    const tickColor = '#999';
+
+    // RTT time-series
+    new Chart(document.getElementById('rtt-chart'), {
       type: 'line',
       data: {
         labels: RTT_DATA.map(d => d.ts.toFixed(1)),
         datasets: [{
           label: 'RTT (ms)',
           data: RTT_DATA.map(d => d.rtt),
-          borderColor: '#00BDF2',
-          backgroundColor: 'rgba(0,189,242,.1)',
-          borderWidth: 1.2,
+          borderColor: '#500778',
+          backgroundColor: 'rgba(80,7,120,.06)',
+          borderWidth: 1,
           pointRadius: 0,
           fill: true,
           tension: 0.2
         }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          annotation: undefined
-        },
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
         scales: {
-          x: {
-            title: { display: true, text: 'Time (s)', color: '#9bb3c7' },
-            ticks: { color: '#9bb3c7', maxTicksLimit: 15, callback: function(v,i) { return RTT_DATA[i] ? RTT_DATA[i].ts.toFixed(0)+'s' : ''; } },
-            grid: { color: 'rgba(255,255,255,.05)' }
-          },
-          y: {
-            title: { display: true, text: 'RTT (ms)', color: '#9bb3c7' },
-            ticks: { color: '#9bb3c7' },
-            grid: { color: 'rgba(255,255,255,.05)' }
-          }
+          x: { title: { display: true, text: 'Time (s)', color: tickColor, font: chartFont }, ticks: { color: tickColor, maxTicksLimit: 14, font: { size: 11 }, callback(v,i) { return RTT_DATA[i] ? RTT_DATA[i].ts.toFixed(0)+'s' : ''; } }, grid: { color: gridColor } },
+          y: { title: { display: true, text: 'RTT (ms)', color: tickColor, font: chartFont }, ticks: { color: tickColor, font: { size: 11 } }, grid: { color: gridColor } }
         }
       }
     });
 
-    // --- Command Latency Histogram ---
-    const bins = [];
-    const binSize = 10;
-    const maxLat = Math.max(...latencies);
+    // Command latency histogram
+    const bins = [], binSize = 10, maxLat = Math.max(...latencies);
     for (let i = 0; i <= maxLat + binSize; i += binSize) bins.push(i);
     const histCounts = new Array(bins.length - 1).fill(0);
-    latencies.forEach(v => {
-      const idx = Math.min(Math.floor(v / binSize), histCounts.length - 1);
-      histCounts[idx]++;
-    });
+    latencies.forEach(v => { histCounts[Math.min(Math.floor(v / binSize), histCounts.length - 1)]++; });
 
-    const latCtx = document.getElementById('latency-chart').getContext('2d');
-    new Chart(latCtx, {
+    new Chart(document.getElementById('latency-chart'), {
       type: 'bar',
       data: {
-        labels: histCounts.map((_, i) => bins[i] + '-' + bins[i+1] + ' ms'),
+        labels: histCounts.map((_, i) => bins[i] + '–' + bins[i+1]),
         datasets: [{
-          label: 'Command Count',
+          label: 'Count',
           data: histCounts,
           backgroundColor: histCounts.map((_, i) => {
             const mid = bins[i] + binSize/2;
-            return mid > 100 ? 'rgba(248,113,113,.7)' : mid > 60 ? 'rgba(251,191,36,.7)' : 'rgba(0,189,242,.6)';
+            return mid > 100 ? '#D64545' : mid > 60 ? '#E0A030' : '#500778';
           }),
-          borderRadius: 4
+          borderRadius: 3
         }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
         scales: {
-          x: {
-            title: { display: true, text: 'Latency Range', color: '#9bb3c7' },
-            ticks: { color: '#9bb3c7', maxRotation: 45 },
-            grid: { display: false }
-          },
-          y: {
-            title: { display: true, text: 'Count', color: '#9bb3c7' },
-            ticks: { color: '#9bb3c7' },
-            grid: { color: 'rgba(255,255,255,.05)' }
-          }
+          x: { title: { display: true, text: 'Latency (ms)', color: tickColor, font: chartFont }, ticks: { color: tickColor, font: { size: 11 }, maxRotation: 45 }, grid: { display: false } },
+          y: { title: { display: true, text: 'Count', color: tickColor, font: chartFont }, ticks: { color: tickColor, font: { size: 11 } }, grid: { color: gridColor } }
         }
       }
     });
 
-    // --- TFI Rolling Window Chart ---
-    const windowSize = 50;
-    const tfiTimeline = [];
+    // TFI rolling window
+    const windowSize = 50, tfiTimeline = [];
     for (let i = windowSize; i < RTT_DATA.length; i++) {
-      const windowData = RTT_DATA.slice(i - windowSize, i);
-      const wRtts = windowData.map(d => d.rtt);
-      const wMean = wRtts.reduce((a,b) => a+b,0) / wRtts.length;
-      const wStd = Math.sqrt(wRtts.reduce((s,v) => s+(v-wMean)**2, 0) / wRtts.length);
-      const wMax = maxRTT;
-      const wLost = windowData.filter(d => d.lost > 0).length / windowData.length;
-      const wTFI = (1 - wMean/wMax) * (1 - wStd/wMax) * (1 - wLost);
-      tfiTimeline.push({ ts: RTT_DATA[i].ts, tfi: wTFI });
+      const w = RTT_DATA.slice(i - windowSize, i).map(d => d.rtt);
+      const wM = w.reduce((a,b)=>a+b,0)/w.length;
+      const wS = Math.sqrt(w.reduce((s,v)=>s+(v-wM)**2,0)/w.length);
+      const wL = RTT_DATA.slice(i-windowSize,i).filter(d=>d.lost>0).length/windowSize;
+      tfiTimeline.push({ ts: RTT_DATA[i].ts, tfi: (1-wM/maxRTT)*(1-wS/maxRTT)*(1-wL) });
     }
 
-    const tfiCtx = document.getElementById('tfi-chart').getContext('2d');
-    new Chart(tfiCtx, {
+    new Chart(document.getElementById('tfi-chart'), {
       type: 'line',
       data: {
         labels: tfiTimeline.map(d => d.ts.toFixed(0)),
         datasets: [{
-          label: 'TFI (rolling window)',
+          label: 'TFI',
           data: tfiTimeline.map(d => d.tfi),
-          borderColor: '#AC10E6',
-          backgroundColor: 'rgba(172,16,230,.1)',
+          borderColor: '#500778',
+          backgroundColor: 'rgba(80,7,120,.04)',
           borderWidth: 1.5,
           pointRadius: 0,
           fill: true,
@@ -388,21 +447,11 @@
         }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: {
-            title: { display: true, text: 'Time (s)', color: '#9bb3c7' },
-            ticks: { color: '#9bb3c7', maxTicksLimit: 12, callback: function(v,i) { return tfiTimeline[i] ? tfiTimeline[i].ts.toFixed(0)+'s' : ''; } },
-            grid: { color: 'rgba(255,255,255,.05)' }
-          },
-          y: {
-            title: { display: true, text: 'TFI Score', color: '#9bb3c7' },
-            ticks: { color: '#9bb3c7' },
-            grid: { color: 'rgba(255,255,255,.05)' },
-            min: 0, max: 1
-          }
+          x: { title: { display: true, text: 'Time (s)', color: tickColor, font: chartFont }, ticks: { color: tickColor, maxTicksLimit: 12, font: { size: 11 }, callback(v,i) { return tfiTimeline[i] ? tfiTimeline[i].ts.toFixed(0)+'s' : ''; } }, grid: { color: gridColor } },
+          y: { title: { display: true, text: 'TFI', color: tickColor, font: chartFont }, ticks: { color: tickColor, font: { size: 11 } }, grid: { color: gridColor }, min: 0, max: 1 }
         }
       }
     });
