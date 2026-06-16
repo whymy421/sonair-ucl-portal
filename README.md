@@ -2,6 +2,8 @@
 
 Evidence dashboard for the **UCL–Nottingham UR5e teleoperation experiment**, built as the UCL campus node of the **SONAIR** federated robotics network.
 
+> Built during a **multi-agent hackathon** as UCL's node in the SONAIR cross-institutional network.
+
 🔗 **Live site:** https://whymy421.github.io/sonair-ucl-portal/
 
 ## Overview
